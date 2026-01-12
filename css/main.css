@@ -19,9 +19,13 @@ body {
 
 /* Header and Navigation */
 #site-header {
+  position: sticky;
+  top: 0;
   width: 100%;
   padding: 1.5rem 2rem;
   background-color: #ffffff;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .navbar {
@@ -165,6 +169,7 @@ body {
   text-align: center;
   max-width: 1200px;
   margin: 0 auto;
+  scroll-margin-top: 100px;
 }
 
 .section-heading {
@@ -198,19 +203,22 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
-  flex-direction: column;
-  gap: 4rem;
-  align-items: center;
+  flex-direction: row;
+  gap: 2rem;
+  align-items: flex-start;
+  justify-content: center;
+  scroll-margin-top: 100px;
 }
 
 .feature-card {
-  width: 100%;
-  max-width: 600px;
+  flex: 1;
+  min-width: 0;
+  max-width: 350px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 2rem;
+  padding: 1.5rem;
 }
 
 .feature-card-wide {
@@ -218,9 +226,9 @@ body {
 }
 
 .feature-icon {
-  width: 120px;
-  height: 120px;
-  margin-bottom: 1.5rem;
+  width: 100px;
+  height: 100px;
+  margin-bottom: 1.25rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -253,18 +261,17 @@ body {
 }
 
 .feature-title {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: #2c2c2c;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
   line-height: 1.2;
 }
 
 .feature-description {
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: #2c2c2c;
-  line-height: 1.7;
-  max-width: 600px;
+  line-height: 1.6;
   margin: 0;
 }
 
@@ -274,6 +281,7 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   text-align: center;
+  scroll-margin-top: 100px;
 }
 
 .course-main-title {
@@ -371,14 +379,25 @@ body {
 .catalogue-column {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
 .catalogue-item {
   font-size: 1.1rem;
   color: #2c2c2c;
   text-align: left;
-  padding: 0.5rem 0;
+  padding: 1.25rem 1.5rem;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.catalogue-item:hover {
+  border-color: #2c2c2c;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
 /* Contact Us Section */
@@ -387,6 +406,7 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   text-align: center;
+  scroll-margin-top: 100px;
 }
 
 .contact-tag {
@@ -720,8 +740,22 @@ body {
     padding: 2rem 2rem;
   }
 
+  .features {
+    gap: 1.5rem;
+  }
+
   .feature-card {
-    max-width: 700px;
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .features {
+    flex-direction: column;
+  }
+
+  .feature-card {
+    max-width: 100%;
   }
 }
 
@@ -818,7 +852,12 @@ body {
 
   .features {
     padding: 3rem 1.5rem;
-    gap: 3rem;
+    flex-direction: column;
+    gap: 2.5rem;
+  }
+
+  .feature-card {
+    max-width: 100%;
   }
 
   .feature-title {
@@ -903,5 +942,134 @@ body {
 
   .signup-form-card {
     padding: 2rem 1.5rem;
+  }
+}
+
+/* Footer */
+.footer {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 4rem 2rem 2rem;
+  margin-top: 5rem;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 3rem;
+  margin-bottom: 2rem;
+}
+
+.footer-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.footer-description {
+  font-size: 0.95rem;
+  color: #666;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.social-icons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.social-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #2c2c2c;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+.social-icon:hover {
+  background-color: #1a1a1a;
+}
+
+.social-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.footer-heading {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #2c2c2c;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.footer-links li {
+  margin: 0;
+}
+
+.footer-links a {
+  color: #999;
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+  color: #2c2c2c;
+}
+
+.footer-divider {
+  max-width: 1200px;
+  margin: 0 auto;
+  height: 1px;
+  background-color: #ddd;
+  margin-bottom: 2rem;
+}
+
+.footer-copyright {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.footer-copyright p {
+  color: #666;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Responsive Footer */
+@media (max-width: 768px) {
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .footer {
+    padding: 3rem 1.5rem 1.5rem;
   }
 }
