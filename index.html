@@ -19,9 +19,9 @@
         <span class="logo-text">Codex</span>
       </div>
       <ul class="nav-links">
-        <li><a href='/pages/about.html'>About</a></li>
-        <li><a href='/pages/courses.html'>Courses</a></li>
-        <li><a href='/pages/contact.html'>Contact Us</a></li>
+        <li><a href='#about-us'>About</a></li>
+        <li><a href='#courses'>Courses</a></li>
+        <li><a href='#contact-us'>Contact Us</a></li>
         <li><a href='/pages/login.html'>Log in</a></li>
         <li><a href='/pages/signup.html' class="btn-signup">Sign up</a></li>
       </ul>
@@ -73,6 +73,79 @@
         </div>
         <h3 class="feature-title">Tools to empower teachers</h3>
         <p class="feature-description">Teachers can use Codex to pinpoint knowledge gaps, customise lessons, and address each student's requirements.</p>
+      </div>
+    </section>
+
+    <!-- Course Overview Section -->
+    <section id="courses" class="courses">
+      <h2 class="section-heading">COURSE OVERVIEW</h2>
+      <h3 class="course-main-title">Computer Science</h3>
+      
+      <div class="course-card">
+        <h4 class="course-card-title">Computer Science</h4>
+        <div class="course-banner">
+          <img src="" alt="Computer Science Banner" class="banner-image">
+          <div class="banner-overlay">
+            <div class="overlay-line"></div>
+            <span class="overlay-text">Computer Science BSc</span>
+          </div>
+        </div>
+        <p class="course-description">Computer Science touches almost all areas of science and modern life. The field is rapidly evolving, and our Schools' diverse research-led teaching is evolving with it. Artificial Intelligence is transforming work, health, entertainment and many other aspects of our lives. This course provides a broad range of technology, software and computing skills and real-world experience in Artificial Intelligence.</p>
+      </div>
+
+      <div class="course-catalogue">
+        <h3 class="catalogue-title">Course Catalogue</h3>
+        <div class="catalogue-list">
+          <div class="catalogue-column">
+            <div class="catalogue-item">Networks</div>
+            <div class="catalogue-item">Data structure & Algorithms</div>
+          </div>
+          <div class="catalogue-column">
+            <div class="catalogue-item">Professional Web Development</div>
+            <div class="catalogue-item">Software Engineering</div>
+          </div>
+          <div class="catalogue-column">
+            <div class="catalogue-item">Javascript</div>
+            <div class="catalogue-item">Python</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Us Section -->
+    <section id="contact-us" class="contact-us">
+      <div class="contact-tag">CONTACT US</div>
+      <h2 class="contact-heading">Let's connect.</h2>
+      <p class="contact-subtitle">Have questions about Codex? Contact us and we'll be happy to help.</p>
+      
+      <div class="contact-form-card">
+        <form class="contact-form">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" placeholder="Your name" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="email@example.com" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" placeholder="Enter your message..." rows="5" required></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="student-status">Are you a registered student?</label>
+            <select id="student-status" name="student-status">
+              <option value="">Select...</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </div>
+          
+          <button type="submit" class="btn-send">Send</button>
+        </form>
       </div>
     </section>
   </main>
