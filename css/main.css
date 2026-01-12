@@ -391,8 +391,8 @@ body {
 
 .contact-tag {
   display: inline-block;
-  background-color: #d4a574;
-  color: #2c2c2c;
+  background-color: #2c2c2c; 
+  color: #ffffff;
   padding: 0.5rem 1.25rem;
   border-radius: 8px;
   font-size: 0.875rem;
@@ -502,6 +502,218 @@ body {
   background-color: #1a1a1a;
 }
 
+/* Login Section */
+.login {
+  padding: 5rem 2rem;
+  width: 100%;
+  text-align: center;
+  background-color: #fafafa;
+  min-height: calc(100vh - 100px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-tag {
+  display: block; 
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  
+  background-color: #2c2c2c;
+  color: #ffffff;
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 2rem;
+}
+
+.login-form-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 3rem;
+  max-width: 500px;
+  margin: 0 auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.login-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: left;
+}
+
+.login-form .form-group label {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #2c2c2c;
+}
+
+.login-form .form-group input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 1px solid #d0d0d0;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  color: #2c2c2c;
+  background-color: #ffffff;
+  transition: border-color 0.2s ease;
+}
+
+.login-form .form-group input:focus {
+  outline: none;
+  border-color: #2c2c2c;
+}
+
+.login-form .form-group input::placeholder {
+  color: #999;
+}
+
+.login-form .form-group input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.login-form .form-group input[type="number"]::-webkit-outer-spin-button,
+.login-form .form-group input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.btn-signup-form {
+  background-color: #2c2c2c;
+  color: #ffffff;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-top: 0.5rem;
+  width: 100%;
+}
+
+.btn-signup-form:hover {
+  background-color: #1a1a1a;
+}
+
+/* Signup Section */
+.signup {
+  padding: 5rem 2rem;
+  width: 100%;
+  text-align: center;
+  background-color: #fafafa;
+  min-height: calc(100vh - 100px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.signup-tag {
+  display: block; 
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  
+  background-color: #2c2c2c;
+  color: #ffffff;
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 2rem;
+}
+
+.signup-heading {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2c2c2c;
+  margin-bottom: 3rem;
+  line-height: 1.2;
+}
+
+.signup-form-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 3rem;
+  max-width: 700px;
+  margin: 0 auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.signup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.signup-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: left;
+}
+
+.signup-form .form-group label {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #2c2c2c;
+}
+
+.signup-form .form-group input,
+.signup-form .form-group select {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 1px solid #d0d0d0;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  color: #2c2c2c;
+  background-color: #ffffff;
+  transition: border-color 0.2s ease;
+}
+
+.signup-form .form-group input:focus,
+.signup-form .form-group select:focus {
+  outline: none;
+  border-color: #2c2c2c;
+}
+
+.signup-form .form-group input::placeholder {
+  color: #999;
+}
+
+.signup-form .form-group select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%232c2c2c' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .about-content-box {
@@ -555,6 +767,18 @@ body {
 
   .contact-form-card {
     padding: 2.5rem;
+  }
+
+  .login-form-card {
+    padding: 2.5rem;
+  }
+
+  .signup-form-card {
+    padding: 2.5rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -658,6 +882,26 @@ body {
   }
 
   .contact-form-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .login {
+    padding: 3rem 1.5rem;
+  }
+
+  .login-form-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .signup {
+    padding: 3rem 1.5rem;
+  }
+
+  .signup-heading {
+    font-size: 2rem;
+  }
+
+  .signup-form-card {
     padding: 2rem 1.5rem;
   }
 }
