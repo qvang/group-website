@@ -1,0 +1,95 @@
+import React, { useState } from 'react';
+
+export default function StudentDashboard() {
+  const [studentName] = useState("Student Name");
+  const [enrolledCourses] = useState([
+    {
+      id: 1,
+      title: "Example Course",
+      lessons: 15,
+      projects: 2
+    },
+    {
+      id: 2,
+      title: "Example Course",
+      lessons: 10,
+      projects: 1
+    },
+    {
+      id: 3,
+      title: "Example Course",
+      lessons: 7,
+      projects: 3
+    }
+  ]);
+
+  const handleViewCourse = (courseId) => {
+    console.log('Viewing course ' + courseId);
+  };
+
+  const handleLogout = () => {
+    console.log("Logging out...");
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <header className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-gray-900">Codex</h1>
+          <nav className="flex gap-8">
+            <a href="#dashboard" className="text-gray-700 hover:text-gray-900">
+              Dashboard
+            </a>
+            <a href="#quiz" className="text-gray-700 hover:text-gray-900">
+              Quiz
+            </a>
+            <button 
+              onClick={handleLogout}
+              className="text-gray-700 hover:text-gray-900"
+            >
+              Log out
+            </button>
+          </nav>
+        </div>
+      </header>
+
+      <main className="max-w-4xl mx-auto px-6 py-12">
+        <h2 className="text-4xl font-bold text-center mb-8">Dashboard</h2>
+        
+        <div className="text-center mb-12">
+          <p className="text-xl text-gray-700">{studentName}</p>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm p-8">
+          <h3 className="text-2xl font-semibold text-center mb-8">Courses</h3>
+          
+          <div className="space-y-6">
+            {enrolledCourses.map((course) => (
+              <div 
+                key={course.id}
+                className="flex items-center justify-between py-6 border-b border-gray-200 last:border-b-0"
+              >
+                <div>
+                  <h4 className="text-lg font-semibold text-gray-900 mb-2">
+                    {course.title}
+                  </h4>
+                  <div className="flex gap-6 text-sm text-gray-600">
+                    <span>{course.lessons} Lessons</span>
+                    <span>{course.projects} Projects</span>
+                  </div>
+                </div>
+                
+                <button
+                  onClick={() => handleViewCourse(course.id)}
+                  className="px-8 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+                >
+                  View
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
