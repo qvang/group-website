@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS users (
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
-    account_type ENUM('student', 'teacher') NOT NULL,
+    account_type ENUM('student', 'teacher', 'admin') NOT NULL,
     course_selection VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -46,3 +46,11 @@ CREATE TABLE IF NOT EXISTS user_courses (
     FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
     UNIQUE KEY unique_user_course (user_id, course_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Insert default admin account
+-- Default credentials: Student ID: 99999999, Password: admin123
+-- IMPORTANT: Change the password after first login for security
+INSERT INTO users (student_id, name, email, password, account_type) VALUES
+(99999999, 'Admin', 'admin@codex.edu', '$2y$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'admin')
+ON DUPLICATE KEY UPDATE name=name;
+

@@ -27,6 +27,22 @@
    define('DB_NAME', 'codex_db');        // Change if needed
    ```
 
+### 2.5. Admin Account
+
+A default admin account is created in the database schema:
+- **Student ID:** 99999999
+- **Password:** admin123 (or check the schema.sql file for the actual default)
+
+**Important:** Change the admin password after first login for security. You can create a new password hash using:
+```bash
+php -r "echo password_hash('your_new_password', PASSWORD_DEFAULT);"
+```
+
+Then update the password in the database:
+```sql
+UPDATE users SET password = 'your_new_hash' WHERE student_id = 99999999;
+```
+
 ### 3. File Renaming
 
 Rename the following files from `.html` to `.php`:
@@ -106,7 +122,7 @@ chmod 644 config/*.php
 - Password change on first login
 - Remember me functionality
 - User dashboard page
-- Admin panel for user management
+- ✅ Admin panel for user management (IMPLEMENTED)
 - Email notifications for registration
 
 ## Troubleshooting

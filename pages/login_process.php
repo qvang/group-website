@@ -43,7 +43,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['logged_in'] = true;
             
             // Redirect based on account type
-            if ($user['account_type'] === 'teacher') {
+            if ($user['account_type'] === 'admin') {
+                header("Location: dashboard/admin_dashboard.php");
+            } elseif ($user['account_type'] === 'teacher') {
                 header("Location: dashboard/teacher_dashboard.php");
             } else {
                 header("Location: dashboard/dashboard.php");
