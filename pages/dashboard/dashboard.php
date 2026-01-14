@@ -78,10 +78,10 @@ $course_display_names = [
     <header id="site-header">
         <nav id="navbar" class="navbar">
             <div class="nav-brand">
-                <a href="../../index.html" style="text-decoration: none; display: flex; align-items: center; gap: 0.5rem; color: inherit;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; color: inherit; cursor: default;">
                     <div class="logo-icon">C</div>
                     <span class="logo-text">Codex</span>
-                </a>
+                </div>
             </div>
             <ul class="nav-links">
                 <li><a href='dashboard.php' class="nav-active">Dashboard</a></li>

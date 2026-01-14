@@ -34,10 +34,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['user_id']) && isset($_
     $is_admin = $_SESSION['account_type'] === 'admin';
     $is_teacher = $_SESSION['account_type'] === 'teacher';
     
-    // Admins can approve/reject teachers
+    // Admins can approve/reject both teachers and students
     // Teachers can approve/reject students
     $can_approve = false;
-    if ($is_admin && $target_user['account_type'] === 'teacher') {
+    if ($is_admin && ($target_user['account_type'] === 'teacher' || $target_user['account_type'] === 'student')) {
         $can_approve = true;
     } elseif ($is_teacher && $target_user['account_type'] === 'student') {
         $can_approve = true;

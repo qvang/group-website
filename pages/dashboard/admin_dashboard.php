@@ -59,11 +59,11 @@ while ($row = $teachers_result->fetch_assoc()) {
 }
 $teachers_stmt->close();
 
-// Get all students
+// Get approved students
 $students_stmt = $conn->prepare("
     SELECT id, name, student_id, email
     FROM users
-    WHERE account_type = 'student'
+    WHERE account_type = 'student' AND status = 'approved'
     ORDER BY name
 ");
 $students_stmt->execute();
@@ -73,6 +73,21 @@ while ($row = $students_result->fetch_assoc()) {
     $students[] = $row;
 }
 $students_stmt->close();
+
+// Get pending students (for approval)
+$pending_students_stmt = $conn->prepare("
+    SELECT id, name, student_id, email
+    FROM users
+    WHERE account_type = 'student' AND status = 'pending'
+    ORDER BY created_at DESC
+");
+$pending_students_stmt->execute();
+$pending_students_result = $pending_students_stmt->get_result();
+$pending_students = [];
+while ($row = $pending_students_result->fetch_assoc()) {
+    $pending_students[] = $row;
+}
+$pending_students_stmt->close();
 closeDBConnection($conn);
 ?>
 <!DOCTYPE html>
@@ -89,10 +104,10 @@ closeDBConnection($conn);
     <header id="site-header">
         <nav id="navbar" class="navbar">
             <div class="nav-brand">
-                <a href="../../index.html" style="text-decoration: none; display: flex; align-items: center; gap: 0.5rem; color: inherit;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; color: inherit; cursor: default;">
                     <div class="logo-icon">C</div>
                     <span class="logo-text">Codex</span>
-                </a>
+                </div>
             </div>
             <ul class="nav-links">
                 <li><a href='admin_dashboard.php' class="nav-active">Dashboard</a></li>
@@ -110,9 +125,14 @@ closeDBConnection($conn);
                 <p class="dashboard-subtitle"><?php echo htmlspecialchars($user_name); ?></p>
                 
                 <?php if (isset($_GET['success'])): ?>
-                    <div class="success-message" style="background-color: #d4edda; color: #155724; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                    <?php
+                    $success = $_GET['success'];
+                    $is_rejected = $success == 'user_rejected';
+                    $bg_color = $is_rejected ? '#f8d7da' : '#d4edda';
+                    $text_color = $is_rejected ? '#721c24' : '#155724';
+                    ?>
+                    <div class="success-message" style="background-color: <?php echo $bg_color; ?>; color: <?php echo $text_color; ?>; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
                         <?php
-                        $success = $_GET['success'];
                         if ($success == 'user_approved') echo 'User approved successfully.';
                         elseif ($success == 'user_rejected') echo 'User rejected successfully.';
                         else echo 'User removed successfully.';
@@ -134,38 +154,6 @@ closeDBConnection($conn);
                     </div>
                 <?php endif; ?>
                 
-                <!-- Pending Teacher Applications Section -->
-                <?php if (!empty($pending_teachers)): ?>
-                    <div class="applications-section">
-                        <div class="applications-header">
-                            <div class="applications-divider"></div>
-                            <h2 class="applications-title">Teacher Applications</h2>
-                        </div>
-                        <div class="applications-list">
-                            <?php foreach ($pending_teachers as $teacher): ?>
-                                <div class="application-item">
-                                    <div class="application-info">
-                                        <h3 class="application-name"><?php echo htmlspecialchars($teacher['name']); ?></h3>
-                                        <p class="application-email"><?php echo htmlspecialchars($teacher['email']); ?></p>
-                                    </div>
-                                    <div class="application-actions">
-                                        <form method="POST" action="../approve_user.php" style="display: inline;">
-                                            <input type="hidden" name="user_id" value="<?php echo $teacher['id']; ?>">
-                                            <input type="hidden" name="action" value="approve">
-                                            <button type="submit" class="btn-approve">Approve</button>
-                                        </form>
-                                        <form method="POST" action="../approve_user.php" style="display: inline;">
-                                            <input type="hidden" name="user_id" value="<?php echo $teacher['id']; ?>">
-                                            <input type="hidden" name="action" value="reject">
-                                            <button type="submit" class="btn-decline">Decline</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                <?php endif; ?>
-                
                 <div class="admin-dashboard-grid">
                     <!-- Left Section: Approved Teachers -->
                     <div class="dashboard-section">
@@ -178,7 +166,7 @@ closeDBConnection($conn);
                                 <?php foreach ($teachers as $teacher): ?>
                                     <div class="list-item">
                                         <div class="item-info">
-                                            <h3 class="item-title">Teacher</h3>
+                                            <h3 class="item-title"><?php echo htmlspecialchars($teacher['name']); ?></h3>
                                             <p class="item-details"><?php echo htmlspecialchars($teacher['student_id']); ?></p>
                                         </div>
                                         <form method="POST" action="../remove_user.php" style="display: inline;">
@@ -215,6 +203,58 @@ closeDBConnection($conn);
                         <?php endif; ?>
                     </div>
                 </div>
+                
+                <!-- Applications Section (Pending Teachers and Students) -->
+                <?php if (!empty($pending_teachers) || !empty($pending_students)): ?>
+                    <div class="applications-section">
+                        <div class="applications-header">
+                            <div class="applications-divider"></div>
+                            <h2 class="applications-title">Applications</h2>
+                        </div>
+                        <div class="applications-list">
+                            <?php foreach ($pending_teachers as $teacher): ?>
+                                <div class="application-item">
+                                    <div class="application-info">
+                                        <h3 class="application-name"><?php echo htmlspecialchars($teacher['name']); ?></h3>
+                                        <p class="application-email"><?php echo htmlspecialchars($teacher['email']); ?> (Teacher)</p>
+                                    </div>
+                                    <div class="application-actions">
+                                        <form method="POST" action="../approve_user.php" style="display: inline;">
+                                            <input type="hidden" name="user_id" value="<?php echo $teacher['id']; ?>">
+                                            <input type="hidden" name="action" value="approve">
+                                            <button type="submit" class="btn-approve">Approve</button>
+                                        </form>
+                                        <form method="POST" action="../approve_user.php" style="display: inline;">
+                                            <input type="hidden" name="user_id" value="<?php echo $teacher['id']; ?>">
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="btn-decline">Decline</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                            <?php foreach ($pending_students as $student): ?>
+                                <div class="application-item">
+                                    <div class="application-info">
+                                        <h3 class="application-name"><?php echo htmlspecialchars($student['name']); ?></h3>
+                                        <p class="application-email"><?php echo htmlspecialchars($student['email']); ?> (Student)</p>
+                                    </div>
+                                    <div class="application-actions">
+                                        <form method="POST" action="../approve_user.php" style="display: inline;">
+                                            <input type="hidden" name="user_id" value="<?php echo $student['id']; ?>">
+                                            <input type="hidden" name="action" value="approve">
+                                            <button type="submit" class="btn-approve">Approve</button>
+                                        </form>
+                                        <form method="POST" action="../approve_user.php" style="display: inline;">
+                                            <input type="hidden" name="user_id" value="<?php echo $student['id']; ?>">
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="btn-decline">Decline</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
             </div>
         </section>
     </main>
