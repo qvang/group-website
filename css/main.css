@@ -1,3 +1,41 @@
+/* CSS Variables - Color Palette */
+:root {
+  /* Primary Colors */
+  --color-white: #ffffff;
+  --color-black: #2c2c2c;
+  --color-black-dark: #1a1a1a;
+  
+  /* Background Colors */
+  --bg-white: #ffffff;
+  --bg-light: #fafafa;
+  --bg-light-grey: #f5f5f5;
+  --bg-placeholder: #f0f0f0;
+  
+  /* Text Colors */
+  --text-primary: #2c2c2c;
+  --text-secondary: #666;
+  --text-placeholder: #999;
+  
+  /* Border Colors */
+  --border-light: #e0e0e0;
+  --border-input: #d0d0d0;
+  --border-divider: #ddd;
+  
+  /* Accent Colors */
+  --accent-blue: #0066cc;
+  --accent-blue-dark: #0052a3;
+  --accent-bronze: #d4a574;
+  
+  /* Gradient Colors */
+  --gradient-start: #f8f9fa;
+  --gradient-end: #e9ecef;
+  
+  /* Shadow */
+  --shadow-light: rgba(0, 0, 0, 0.05);
+  --shadow-medium: rgba(0, 0, 0, 0.08);
+  --shadow-dark: rgba(0, 0, 0, 0.1);
+}
+
 /* Reset and Base Styles */
 * {
   margin: 0;
@@ -11,8 +49,8 @@ html {
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background-color: #ffffff;
-  color: #2c2c2c;
+  background-color: var(--bg-white);
+  color: var(--text-primary);
   line-height: 1.6;
   min-height: 100vh;
 }
@@ -23,9 +61,9 @@ body {
   top: 0;
   width: 100%;
   padding: 1.5rem 2rem;
-  background-color: #ffffff;
+  background-color: var(--bg-white);
   z-index: 1000;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px var(--shadow-light);
 }
 
 .navbar {
@@ -45,12 +83,12 @@ body {
 .logo-icon {
   width: 32px;
   height: 32px;
-  background-color: #2c2c2c;
+  background-color: var(--color-black);
   border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
+  color: var(--color-white);
   font-weight: bold;
   font-size: 1.2rem;
   position: relative;
@@ -61,14 +99,14 @@ body {
   position: absolute;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, transparent 0%, transparent 45%, #ffffff 45%, #ffffff 55%, transparent 55%);
+  background: linear-gradient(135deg, transparent 0%, transparent 45%, var(--color-white) 45%, var(--color-white) 55%, transparent 55%);
   border-radius: 4px;
 }
 
 .logo-text {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #2c2c2c;
+  color: var(--text-primary);
   letter-spacing: -0.5px;
 }
 
@@ -86,19 +124,19 @@ body {
 
 .nav-links a {
   text-decoration: none;
-  color: #2c2c2c;
+  color: var(--text-primary);
   font-size: 1rem;
   font-weight: 400;
   transition: color 0.2s ease;
 }
 
 .nav-links a:hover {
-  color: #1a1a1a;
+  color: var(--color-black-dark);
 }
 
 .btn-signup {
-  background-color: #2c2c2c !important;
-  color: #ffffff !important;
+  background-color: var(--color-black) !important;
+  color: var(--color-white) !important;
   padding: 0.625rem 1.5rem;
   border-radius: 8px;
   font-weight: 500;
@@ -106,8 +144,8 @@ body {
 }
 
 .btn-signup:hover {
-  background-color: #1a1a1a !important;
-  color: #ffffff !important;
+  background-color: var(--color-black-dark) !important;
+  color: var(--color-white) !important;
 }
 
 /* Hero Section */
@@ -131,7 +169,7 @@ body {
 .hero-title {
   font-size: 4.5rem;
   font-weight: 700;
-  color: #2c2c2c;
+  color: var(--text-primary);
   letter-spacing: -2px;
   line-height: 1.1;
   margin: 0;
@@ -139,7 +177,7 @@ body {
 
 .hero-subtitle {
   font-size: 1.25rem;
-  color: #2c2c2c;
+  color: var(--text-primary);
   font-weight: 400;
   line-height: 1.6;
   max-width: 600px;
@@ -147,8 +185,8 @@ body {
 }
 
 .btn-get-started {
-  background-color: #2c2c2c;
-  color: #ffffff;
+  background-color: var(--color-black);
+  color: var(--color-white);
   padding: 1rem 2.5rem;
   border-radius: 8px;
   font-size: 1rem;
@@ -160,7 +198,7 @@ body {
 }
 
 .btn-get-started:hover {
-  background-color: #1a1a1a;
+  background-color: var(--color-black-dark);
 }
 
 /* About Us Section */
@@ -175,14 +213,14 @@ body {
 .section-heading {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #2c2c2c;
+  color: var(--text-primary);
   text-transform: uppercase;
   letter-spacing: 2px;
   margin-bottom: 2.5rem;
 }
 
 .about-content-box {
-  background-color: #f5f5f5;
+  background-color: var(--bg-light-grey);
   border-radius: 12px;
   padding: 2.5rem 3rem;
   max-width: 900px;
@@ -191,7 +229,7 @@ body {
 
 .about-text {
   font-size: 1.1rem;
-  color: #2c2c2c;
+  color: var(--text-primary);
   line-height: 1.8;
   text-align: center;
   margin: 0;
@@ -233,7 +271,7 @@ body {
   align-items: center;
   justify-content: center;
   border-radius: 12px;
-  background-color: #f0f0f0;
+  background-color: var(--bg-placeholder);
 }
 
 .feature-icon .icon-image {
@@ -249,7 +287,7 @@ body {
   margin-bottom: 2rem;
   border-radius: 12px;
   overflow: hidden;
-  background-color: #f0f0f0;
+  background-color: var(--bg-placeholder);
   aspect-ratio: 16 / 9;
 }
 
@@ -263,14 +301,14 @@ body {
 .feature-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #2c2c2c;
+  color: var(--text-primary);
   margin-bottom: 0.75rem;
   line-height: 1.2;
 }
 
 .feature-description {
   font-size: 1rem;
-  color: #2c2c2c;
+  color: var(--text-primary);
   line-height: 1.6;
   margin: 0;
 }
@@ -287,24 +325,24 @@ body {
 .course-main-title {
   font-size: 3rem;
   font-weight: 700;
-  color: #2c2c2c;
+  color: var(--text-primary);
   margin-bottom: 3rem;
   line-height: 1.2;
 }
 
 .course-card {
-  background-color: #ffffff;
+  background-color: var(--bg-white);
   border-radius: 12px;
   padding: 2.5rem;
   margin-bottom: 4rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px var(--shadow-medium);
   text-align: left;
 }
 
 .course-card-title {
   font-size: 2rem;
   font-weight: 700;
-  color: #2c2c2c;
+  color: var(--text-primary);
   margin-bottom: 1.5rem;
 }
 
@@ -314,7 +352,7 @@ body {
   margin-bottom: 2rem;
   border-radius: 8px;
   overflow: hidden;
-  background-color: #f0f0f0;
+  background-color: var(--bg-placeholder);
   aspect-ratio: 16 / 6;
 }
 
@@ -329,7 +367,7 @@ body {
   position: absolute;
   bottom: 1.5rem;
   left: 1.5rem;
-  background-color: #ffffff;
+  background-color: var(--bg-white);
   padding: 1rem 1.5rem;
   border-radius: 4px;
   display: flex;
@@ -340,19 +378,19 @@ body {
 .overlay-line {
   width: 4px;
   height: 100%;
-  background-color: #0066cc;
+  background-color: var(--accent-blue);
   border-radius: 2px;
 }
 
 .overlay-text {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #2c2c2c;
+  color: var(--text-primary);
 }
 
 .course-description {
   font-size: 1.1rem;
-  color: #2c2c2c;
+  color: var(--text-primary);
   line-height: 1.8;
   margin: 0;
 }
@@ -364,7 +402,7 @@ body {
 .catalogue-title {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #2c2c2c;
+  color: var(--text-primary);
   margin-bottom: 2.5rem;
 }
 
@@ -384,19 +422,19 @@ body {
 
 .catalogue-item {
   font-size: 1.1rem;
-  color: #2c2c2c;
+  color: var(--text-primary);
   text-align: left;
   padding: 1.25rem 1.5rem;
-  background-color: #ffffff;
-  border: 1px solid #e0e0e0;
+  background-color: var(--bg-white);
+  border: 1px solid var(--border-light);
   border-radius: 8px;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px var(--shadow-light);
 }
 
 .catalogue-item:hover {
-  border-color: #2c2c2c;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-color: var(--text-primary);
+  box-shadow: 0 4px 8px var(--shadow-dark);
   transform: translateY(-2px);
 }
 
@@ -411,8 +449,8 @@ body {
 
 .contact-tag {
   display: inline-block;
-  background-color: #2c2c2c; 
-  color: #ffffff;
+  background-color: var(--color-black); 
+  color: var(--color-white);
   padding: 0.5rem 1.25rem;
   border-radius: 8px;
   font-size: 0.875rem;
@@ -425,25 +463,25 @@ body {
 .contact-heading {
   font-size: 3.5rem;
   font-weight: 700;
-  color: #2c2c2c;
+  color: var(--text-primary);
   margin-bottom: 1rem;
   line-height: 1.2;
 }
 
 .contact-subtitle {
   font-size: 1.2rem;
-  color: #2c2c2c;
+  color: var(--text-primary);
   margin-bottom: 3rem;
   line-height: 1.6;
 }
 
 .contact-form-card {
-  background-color: #ffffff;
+  background-color: var(--bg-white);
   border-radius: 12px;
   padding: 3rem;
   max-width: 700px;
   margin: 0 auto;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px var(--shadow-medium);
 }
 
 .contact-form {
@@ -462,7 +500,7 @@ body {
 .form-group label {
   font-size: 1rem;
   font-weight: 500;
-  color: #2c2c2c;
+  color: var(--text-primary);
 }
 
 .form-group input,
@@ -470,12 +508,12 @@ body {
 .form-group select {
   width: 100%;
   padding: 0.875rem 1rem;
-  border: 1px solid #d0d0d0;
+  border: 1px solid var(--border-input);
   border-radius: 8px;
   font-size: 1rem;
   font-family: inherit;
-  color: #2c2c2c;
-  background-color: #ffffff;
+  color: var(--text-primary);
+  background-color: var(--bg-white);
   transition: border-color 0.2s ease;
 }
 
@@ -483,12 +521,12 @@ body {
 .form-group textarea:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #2c2c2c;
+  border-color: var(--text-primary);
 }
 
 .form-group input::placeholder,
 .form-group textarea::placeholder {
-  color: #999;
+  color: var(--text-placeholder);
 }
 
 .form-group textarea {
@@ -506,8 +544,8 @@ body {
 }
 
 .btn-send {
-  background-color: #2c2c2c;
-  color: #ffffff;
+  background-color: var(--color-black);
+  color: var(--color-white);
   padding: 1rem 2rem;
   border: none;
   border-radius: 8px;
@@ -519,7 +557,7 @@ body {
 }
 
 .btn-send:hover {
-  background-color: #1a1a1a;
+  background-color: var(--color-black-dark);
 }
 
 /* Login Section */
@@ -527,7 +565,7 @@ body {
   padding: 5rem 2rem;
   width: 100%;
   text-align: center;
-  background-color: #fafafa;
+  background-color: var(--bg-light);
   min-height: calc(100vh - 100px);
   display: flex;
   flex-direction: column;
@@ -541,8 +579,8 @@ body {
   margin-left: auto;
   margin-right: auto;
   
-  background-color: #2c2c2c;
-  color: #ffffff;
+  background-color: var(--color-black);
+  color: var(--color-white);
   padding: 0.5rem 1.25rem;
   border-radius: 8px;
   font-size: 0.875rem;
@@ -553,12 +591,12 @@ body {
 }
 
 .login-form-card {
-  background-color: #ffffff;
+  background-color: var(--bg-white);
   border-radius: 12px;
   padding: 3rem;
   max-width: 500px;
   margin: 0 auto;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px var(--shadow-medium);
 }
 
 .login-form {
@@ -577,28 +615,28 @@ body {
 .login-form .form-group label {
   font-size: 1rem;
   font-weight: 500;
-  color: #2c2c2c;
+  color: var(--text-primary);
 }
 
 .login-form .form-group input {
   width: 100%;
   padding: 0.875rem 1rem;
-  border: 1px solid #d0d0d0;
+  border: 1px solid var(--border-input);
   border-radius: 8px;
   font-size: 1rem;
   font-family: inherit;
-  color: #2c2c2c;
-  background-color: #ffffff;
+  color: var(--text-primary);
+  background-color: var(--bg-white);
   transition: border-color 0.2s ease;
 }
 
 .login-form .form-group input:focus {
   outline: none;
-  border-color: #2c2c2c;
+  border-color: var(--text-primary);
 }
 
 .login-form .form-group input::placeholder {
-  color: #999;
+  color: var(--text-placeholder);
 }
 
 .login-form .form-group input[type="number"] {
@@ -613,8 +651,8 @@ body {
 }
 
 .btn-signup-form {
-  background-color: #2c2c2c;
-  color: #ffffff;
+  background-color: var(--color-black);
+  color: var(--color-white);
   padding: 1rem 2rem;
   border: none;
   border-radius: 8px;
@@ -627,7 +665,7 @@ body {
 }
 
 .btn-signup-form:hover {
-  background-color: #1a1a1a;
+  background-color: var(--color-black-dark);
 }
 
 /* Signup Section */
@@ -635,7 +673,7 @@ body {
   padding: 5rem 2rem;
   width: 100%;
   text-align: center;
-  background-color: #fafafa;
+  background-color: var(--bg-light);
   min-height: calc(100vh - 100px);
   display: flex;
   flex-direction: column;
@@ -649,8 +687,8 @@ body {
   margin-left: auto;
   margin-right: auto;
   
-  background-color: #2c2c2c;
-  color: #ffffff;
+  background-color: var(--color-black);
+  color: var(--color-white);
   padding: 0.5rem 1.25rem;
   border-radius: 8px;
   font-size: 0.875rem;
@@ -663,18 +701,18 @@ body {
 .signup-heading {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #2c2c2c;
+  color: var(--text-primary);
   margin-bottom: 3rem;
   line-height: 1.2;
 }
 
 .signup-form-card {
-  background-color: #ffffff;
+  background-color: var(--bg-white);
   border-radius: 12px;
   padding: 3rem;
   max-width: 700px;
   margin: 0 auto;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px var(--shadow-medium);
 }
 
 .signup-form {
@@ -699,30 +737,30 @@ body {
 .signup-form .form-group label {
   font-size: 1rem;
   font-weight: 500;
-  color: #2c2c2c;
+  color: var(--text-primary);
 }
 
 .signup-form .form-group input,
 .signup-form .form-group select {
   width: 100%;
   padding: 0.875rem 1rem;
-  border: 1px solid #d0d0d0;
+  border: 1px solid var(--border-input);
   border-radius: 8px;
   font-size: 1rem;
   font-family: inherit;
-  color: #2c2c2c;
-  background-color: #ffffff;
+  color: var(--text-primary);
+  background-color: var(--bg-white);
   transition: border-color 0.2s ease;
 }
 
 .signup-form .form-group input:focus,
 .signup-form .form-group select:focus {
   outline: none;
-  border-color: #2c2c2c;
+  border-color: var(--text-primary);
 }
 
 .signup-form .form-group input::placeholder {
-  color: #999;
+  color: var(--text-placeholder);
 }
 
 .signup-form .form-group select {
@@ -950,23 +988,23 @@ body {
   padding: 5rem 2rem;
   max-width: 900px;
   margin: 0 auto;
-  background-color: #ffffff;
+  background-color: var(--bg-white);
 }
 
 .legal-content {
   line-height: 1.8;
-  color: #2c2c2c;
+  color: var(--text-primary);
 }
 
 .legal-content h1 {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #2c2c2c;
+  color: var(--text-primary);
   margin-bottom: 0.5rem;
 }
 
 .last-updated {
-  color: #666;
+  color: var(--text-secondary);
   font-size: 0.95rem;
   margin-bottom: 3rem;
   font-style: italic;
@@ -979,7 +1017,7 @@ body {
 .legal-content h2 {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #2c2c2c;
+  color: var(--text-primary);
   margin-top: 2.5rem;
   margin-bottom: 1rem;
 }
@@ -987,14 +1025,14 @@ body {
 .legal-content h3 {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #2c2c2c;
+  color: var(--text-primary);
   margin-top: 1.5rem;
   margin-bottom: 0.75rem;
 }
 
 .legal-content p {
   font-size: 1rem;
-  color: #2c2c2c;
+  color: var(--text-primary);
   margin-bottom: 1rem;
 }
 
@@ -1005,19 +1043,19 @@ body {
 
 .legal-content li {
   font-size: 1rem;
-  color: #2c2c2c;
+  color: var(--text-primary);
   margin-bottom: 0.5rem;
   line-height: 1.6;
 }
 
 .legal-content a {
-  color: #0066cc;
+  color: var(--accent-blue);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
 .legal-content a:hover {
-  color: #0052a3;
+  color: var(--accent-blue-dark);
   text-decoration: underline;
 }
 
@@ -1046,7 +1084,7 @@ body {
 
 /* Footer */
 .footer {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
   padding: 4rem 2rem 2rem;
   margin-top: 5rem;
 }
@@ -1075,7 +1113,7 @@ body {
 
 .footer-description {
   font-size: 0.95rem;
-  color: #666;
+  color: var(--text-secondary);
   line-height: 1.6;
   margin: 0;
 }
@@ -1090,8 +1128,8 @@ body {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: #2c2c2c;
-  color: #ffffff;
+  background-color: var(--color-black);
+  color: var(--color-white);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1100,7 +1138,7 @@ body {
 }
 
 .social-icon:hover {
-  background-color: #1a1a1a;
+  background-color: var(--color-black-dark);
 }
 
 .social-icon svg {
@@ -1111,7 +1149,7 @@ body {
 .footer-heading {
   font-size: 1rem;
   font-weight: 700;
-  color: #2c2c2c;
+  color: var(--text-primary);
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 0.5rem;
@@ -1131,21 +1169,21 @@ body {
 }
 
 .footer-links a {
-  color: #999;
+  color: var(--text-placeholder);
   text-decoration: none;
   font-size: 0.95rem;
   transition: color 0.2s ease;
 }
 
 .footer-links a:hover {
-  color: #2c2c2c;
+  color: var(--text-primary);
 }
 
 .footer-divider {
   max-width: 1200px;
   margin: 0 auto;
   height: 1px;
-  background-color: #ddd;
+  background-color: var(--border-divider);
   margin-bottom: 2rem;
 }
 
@@ -1156,7 +1194,7 @@ body {
 }
 
 .footer-copyright p {
-  color: #666;
+  color: var(--text-secondary);
   font-size: 0.9rem;
   margin: 0;
 }

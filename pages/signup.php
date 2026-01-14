@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -24,8 +27,8 @@
         <li><a href='../index.html#about-us'>About</a></li>
         <li><a href='../index.html#courses'>Courses</a></li>
         <li><a href='../index.html#contact-us'>Contact Us</a></li>
-        <li><a href='login.html'>Log in</a></li>
-        <li><a href='signup.html' class="btn-signup">Sign up</a></li>
+        <li><a href='login.php'>Log in</a></li>
+        <li><a href='signup.php' class="btn-signup">Sign up</a></li>
       </ul>
     </nav>
   </header>
@@ -36,8 +39,22 @@
     <section id="signup" class="signup">
       <div class="signup-tag">SIGN UP</div>
       
+      <?php if (isset($_GET['error'])): ?>
+        <div class="error-message">
+          <?php
+          $error = $_GET['error'];
+          if ($error == 'empty_fields') echo 'Please fill in all fields.';
+          elseif ($error == 'invalid_email') echo 'Please enter a valid email address.';
+          elseif ($error == 'invalid_account_type') echo 'Please select a valid account type.';
+          elseif ($error == 'email_exists') echo 'This email is already registered.';
+          elseif ($error == 'registration_failed') echo 'Registration failed. Please try again.';
+          else echo 'An error occurred. Please try again.';
+          ?>
+        </div>
+      <?php endif; ?>
+      
       <div class="signup-form-card">
-        <form class="signup-form">
+        <form class="signup-form" method="POST" action="signup_process.php">
           <div class="form-row">
             <div class="form-group">
               <label for="signup-name">Name</label>
@@ -52,7 +69,7 @@
           
           <div class="form-group">
             <label for="account-type">Select account</label>
-            <select id="account-type" name="account-type" required>
+            <select id="account-type" name="account_type" required>
               <option value="">Select...</option>
               <option value="student">Student</option>
               <option value="teacher">Teacher</option>
@@ -61,7 +78,7 @@
           
           <div class="form-group">
             <label for="course-selection">Select course(s)</label>
-            <select id="course-selection" name="course-selection" required>
+            <select id="course-selection" name="course_selection" required>
               <option value="">Select...</option>
               <option value="networks">Networks</option>
               <option value="data-structures">Data structure & Algorithms</option>

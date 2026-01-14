@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -24,8 +27,8 @@
         <li><a href='../index.html#about-us'>About</a></li>
         <li><a href='../index.html#courses'>Courses</a></li>
         <li><a href='../index.html#contact-us'>Contact Us</a></li>
-        <li><a href='login.html'>Log in</a></li>
-        <li><a href='signup.html' class="btn-signup">Sign up</a></li>
+        <li><a href='login.php'>Log in</a></li>
+        <li><a href='signup.php' class="btn-signup">Sign up</a></li>
       </ul>
     </nav>
   </header>
@@ -36,8 +39,28 @@
     <section id="login" class="login">
       <div class="login-tag">LOG IN</div>
       
+      <?php if (isset($_GET['error'])): ?>
+        <div class="error-message">
+          <?php
+          $error = $_GET['error'];
+          if ($error == 'empty_fields') echo 'Please fill in all fields.';
+          elseif ($error == 'invalid_id') echo 'Invalid student ID format. Please enter an 8-digit ID.';
+          elseif ($error == 'invalid_credentials') echo 'Invalid student ID or password.';
+          else echo 'An error occurred. Please try again.';
+          ?>
+        </div>
+      <?php endif; ?>
+      
+      <?php if (isset($_GET['signup'])): ?>
+        <div class="success-message">
+          Registration successful! Your Student ID: <?php echo htmlspecialchars($_GET['student_id']); ?><br>
+          Temporary Password: <?php echo htmlspecialchars($_GET['temp_password']); ?><br>
+          Please log in and change your password.
+        </div>
+      <?php endif; ?>
+      
       <div class="login-form-card">
-        <form class="login-form">
+        <form class="login-form" method="POST" action="login_process.php">
           <div class="form-group">
             <label for="login-id">ID</label>
             <input type="number" id="login-id" name="id" placeholder="Enter 8 digit ID here..." min="0" max="99999999" required>
