@@ -7,6 +7,12 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     exit();
 }
 
+// Check if user is approved (admins should always be approved, but check anyway)
+if (!isset($_SESSION['status']) || $_SESSION['status'] !== 'approved') {
+    header("Location: ../login.php?error=pending_approval");
+    exit();
+}
+
 // Redirect non-admins to their respective dashboards
 if (!isset($_SESSION['account_type']) || $_SESSION['account_type'] !== 'admin') {
     if ($_SESSION['account_type'] === 'teacher') {
@@ -22,12 +28,27 @@ require_once '../../config/db_connection.php';
 // Get user information from session
 $user_name = $_SESSION['name'];
 
-// Get all teachers
+// Get pending teachers (for approval)
 $conn = getDBConnection();
+$pending_teachers_stmt = $conn->prepare("
+    SELECT id, name, student_id, email
+    FROM users
+    WHERE account_type = 'teacher' AND status = 'pending'
+    ORDER BY created_at DESC
+");
+$pending_teachers_stmt->execute();
+$pending_teachers_result = $pending_teachers_stmt->get_result();
+$pending_teachers = [];
+while ($row = $pending_teachers_result->fetch_assoc()) {
+    $pending_teachers[] = $row;
+}
+$pending_teachers_stmt->close();
+
+// Get approved teachers
 $teachers_stmt = $conn->prepare("
     SELECT id, name, student_id, email
     FROM users
-    WHERE account_type = 'teacher'
+    WHERE account_type = 'teacher' AND status = 'approved'
     ORDER BY name
 ");
 $teachers_stmt->execute();
@@ -90,7 +111,12 @@ closeDBConnection($conn);
                 
                 <?php if (isset($_GET['success'])): ?>
                     <div class="success-message" style="background-color: #d4edda; color: #155724; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-                        User removed successfully.
+                        <?php
+                        $success = $_GET['success'];
+                        if ($success == 'user_approved') echo 'User approved successfully.';
+                        elseif ($success == 'user_rejected') echo 'User rejected successfully.';
+                        else echo 'User removed successfully.';
+                        ?>
                     </div>
                 <?php endif; ?>
                 
@@ -100,13 +126,48 @@ closeDBConnection($conn);
                         $error = $_GET['error'];
                         if ($error == 'cannot_delete_self') echo 'You cannot delete your own account.';
                         elseif ($error == 'delete_failed') echo 'Failed to remove user. Please try again.';
+                        elseif ($error == 'user_not_found') echo 'User not found.';
+                        elseif ($error == 'unauthorized') echo 'You are not authorized to perform this action.';
+                        elseif ($error == 'update_failed') echo 'Failed to update user status. Please try again.';
                         else echo 'An error occurred.';
                         ?>
                     </div>
                 <?php endif; ?>
                 
+                <!-- Pending Teacher Applications Section -->
+                <?php if (!empty($pending_teachers)): ?>
+                    <div class="applications-section">
+                        <div class="applications-header">
+                            <div class="applications-divider"></div>
+                            <h2 class="applications-title">Teacher Applications</h2>
+                        </div>
+                        <div class="applications-list">
+                            <?php foreach ($pending_teachers as $teacher): ?>
+                                <div class="application-item">
+                                    <div class="application-info">
+                                        <h3 class="application-name"><?php echo htmlspecialchars($teacher['name']); ?></h3>
+                                        <p class="application-email"><?php echo htmlspecialchars($teacher['email']); ?></p>
+                                    </div>
+                                    <div class="application-actions">
+                                        <form method="POST" action="../approve_user.php" style="display: inline;">
+                                            <input type="hidden" name="user_id" value="<?php echo $teacher['id']; ?>">
+                                            <input type="hidden" name="action" value="approve">
+                                            <button type="submit" class="btn-approve">Approve</button>
+                                        </form>
+                                        <form method="POST" action="../approve_user.php" style="display: inline;">
+                                            <input type="hidden" name="user_id" value="<?php echo $teacher['id']; ?>">
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="btn-decline">Decline</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
+                
                 <div class="admin-dashboard-grid">
-                    <!-- Left Section: Teachers -->
+                    <!-- Left Section: Approved Teachers -->
                     <div class="dashboard-section">
                         <h2 class="section-heading">Teachers</h2>
                         

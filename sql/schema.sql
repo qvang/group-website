@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     account_type ENUM('student', 'teacher', 'admin') NOT NULL,
+    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
     course_selection VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -50,7 +51,15 @@ CREATE TABLE IF NOT EXISTS user_courses (
 -- Insert default admin account
 -- Default credentials: Student ID: 99999999, Password: admin123
 -- IMPORTANT: Change the password after first login for security
-INSERT INTO users (student_id, name, email, password, account_type) VALUES
-(99999999, 'Admin', 'admin@codex.edu', '$2y$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'admin')
+-- 
+-- NOTE: The password hash below is a placeholder. After running this schema,
+-- run setup_admin.php to generate a proper password hash for "admin123"
+-- Or manually update the password using:
+-- UPDATE users SET password = '[generated_hash]' WHERE student_id = 99999999;
+--
+-- To generate a hash, use: generate_admin_hash.php or run:
+-- php -r "echo password_hash('admin123', PASSWORD_DEFAULT);"
+INSERT INTO users (student_id, name, email, password, account_type, status) VALUES
+(99999999, 'Admin', 'admin@codex.edu', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', 'approved')
 ON DUPLICATE KEY UPDATE name=name;
 

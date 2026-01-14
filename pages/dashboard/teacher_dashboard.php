@@ -8,6 +8,12 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     exit();
 }
 
+// Check if user is approved
+if (!isset($_SESSION['status']) || $_SESSION['status'] !== 'approved') {
+    header("Location: ../login.php?error=pending_approval");
+    exit();
+}
+
 // Redirect students to student dashboard
 if (isset($_SESSION['account_type']) && $_SESSION['account_type'] === 'student') {
     header("Location: dashboard.php");
@@ -30,12 +36,12 @@ while ($row = $courses_result->fetch_assoc()) {
 }
 $courses_stmt->close();
 
-// Get all students enrolled in courses
+// Get approved students enrolled in courses
 $students_stmt = $conn->prepare("
     SELECT DISTINCT u.id, u.name, u.student_id, u.email
     FROM users u
     JOIN user_courses uc ON u.id = uc.user_id
-    WHERE u.account_type = 'student'
+    WHERE u.account_type = 'student' AND u.status = 'approved'
     ORDER BY u.name
 ");
 $students_stmt->execute();
@@ -45,6 +51,21 @@ while ($row = $students_result->fetch_assoc()) {
     $students[] = $row;
 }
 $students_stmt->close();
+
+// Get pending students (for approval)
+$pending_students_stmt = $conn->prepare("
+    SELECT id, name, student_id, email
+    FROM users
+    WHERE account_type = 'student' AND status = 'pending'
+    ORDER BY created_at DESC
+");
+$pending_students_stmt->execute();
+$pending_students_result = $pending_students_stmt->get_result();
+$pending_students = [];
+while ($row = $pending_students_result->fetch_assoc()) {
+    $pending_students[] = $row;
+}
+$pending_students_stmt->close();
 closeDBConnection($conn);
 
 // Course data with lessons and projects
@@ -90,6 +111,28 @@ $course_data = [
             <div class="dashboard-container">
                 <h1 class="dashboard-title">Dashboard</h1>
                 <p class="dashboard-subtitle"><?php echo htmlspecialchars($user_name); ?></p>
+                
+                <?php if (isset($_GET['success'])): ?>
+                    <div class="success-message" style="background-color: #d4edda; color: #155724; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                        <?php
+                        $success = $_GET['success'];
+                        if ($success == 'user_approved') echo 'Student approved successfully.';
+                        elseif ($success == 'user_rejected') echo 'Student rejected successfully.';
+                        ?>
+                    </div>
+                <?php endif; ?>
+                
+                <?php if (isset($_GET['error'])): ?>
+                    <div class="error-message" style="background-color: #f8d7da; color: #721c24; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                        <?php
+                        $error = $_GET['error'];
+                        if ($error == 'user_not_found') echo 'Student not found.';
+                        elseif ($error == 'unauthorized') echo 'You are not authorized to perform this action.';
+                        elseif ($error == 'update_failed') echo 'Failed to update student status. Please try again.';
+                        else echo 'An error occurred.';
+                        ?>
+                    </div>
+                <?php endif; ?>
                 
                 <div class="teacher-dashboard-grid">
                     <!-- Left Section: My Courses -->
@@ -140,6 +183,38 @@ $course_data = [
                         <?php endif; ?>
                     </div>
                 </div>
+                
+                <!-- Student Applications Section -->
+                <?php if (!empty($pending_students)): ?>
+                    <div class="applications-section">
+                        <div class="applications-header">
+                            <div class="applications-divider"></div>
+                            <h2 class="applications-title">Student Applications</h2>
+                        </div>
+                        <div class="applications-list">
+                            <?php foreach ($pending_students as $student): ?>
+                                <div class="application-item">
+                                    <div class="application-info">
+                                        <h3 class="application-name"><?php echo htmlspecialchars($student['name']); ?></h3>
+                                        <p class="application-email"><?php echo htmlspecialchars($student['email']); ?></p>
+                                    </div>
+                                    <div class="application-actions">
+                                        <form method="POST" action="../approve_user.php" style="display: inline;">
+                                            <input type="hidden" name="user_id" value="<?php echo $student['id']; ?>">
+                                            <input type="hidden" name="action" value="approve">
+                                            <button type="submit" class="btn-approve">Approve</button>
+                                        </form>
+                                        <form method="POST" action="../approve_user.php" style="display: inline;">
+                                            <input type="hidden" name="user_id" value="<?php echo $student['id']; ?>">
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="btn-decline">Decline</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
             </div>
         </section>
     </main>

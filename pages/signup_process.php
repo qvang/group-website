@@ -10,8 +10,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $account_type = isset($_POST['account_type']) ? $_POST['account_type'] : '';
     $course_selection = isset($_POST['course_selection']) ? $_POST['course_selection'] : '';
     
-    // Validate input
-    if (empty($name) || empty($email) || empty($account_type) || empty($course_selection)) {
+    // Validate input (course_selection only required for students)
+    if (empty($name) || empty($email) || empty($account_type)) {
+        header("Location: signup.php?error=empty_fields");
+        exit();
+    }
+    
+    // Course selection is required for students only
+    if ($account_type === 'student' && empty($course_selection)) {
         header("Location: signup.php?error=empty_fields");
         exit();
     }
@@ -53,36 +59,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $temp_password = generateTempPassword();
     $hashed_password = password_hash($temp_password, PASSWORD_DEFAULT);
     
-    // Insert new user
-    $stmt = $conn->prepare("INSERT INTO users (student_id, name, email, password, account_type, course_selection) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("isssss", $student_id, $name, $email, $hashed_password, $account_type, $course_selection);
+    // Insert new user (course_selection can be NULL for teachers)
+    // All new users start with 'pending' status and need approval
+    $course_selection_value = $account_type === 'student' ? $course_selection : null;
+    $status = 'pending';
+    $stmt = $conn->prepare("INSERT INTO users (student_id, name, email, password, account_type, status, course_selection) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("issssss", $student_id, $name, $email, $hashed_password, $account_type, $status, $course_selection_value);
     
     if ($stmt->execute()) {
-        // Get the course ID
-        $course_stmt = $conn->prepare("SELECT id FROM courses WHERE course_code = ?");
-        $course_stmt->bind_param("s", $course_selection);
-        $course_stmt->execute();
-        $course_result = $course_stmt->get_result();
+        $user_id = $stmt->insert_id;
         
-        if ($course_result->num_rows > 0) {
-            $course = $course_result->fetch_assoc();
-            $user_id = $stmt->insert_id;
-            $course_id = $course['id'];
+        // Only enroll students in courses (teachers don't need course enrollment)
+        if ($account_type === 'student' && !empty($course_selection)) {
+            // Get the course ID
+            $course_stmt = $conn->prepare("SELECT id FROM courses WHERE course_code = ?");
+            $course_stmt->bind_param("s", $course_selection);
+            $course_stmt->execute();
+            $course_result = $course_stmt->get_result();
             
-            // Link user to course
-            $link_stmt = $conn->prepare("INSERT INTO user_courses (user_id, course_id) VALUES (?, ?)");
-            $link_stmt->bind_param("ii", $user_id, $course_id);
-            $link_stmt->execute();
-            $link_stmt->close();
+            if ($course_result->num_rows > 0) {
+                $course = $course_result->fetch_assoc();
+                $course_id = $course['id'];
+                
+                // Link user to course
+                $link_stmt = $conn->prepare("INSERT INTO user_courses (user_id, course_id) VALUES (?, ?)");
+                $link_stmt->bind_param("ii", $user_id, $course_id);
+                $link_stmt->execute();
+                $link_stmt->close();
+            }
+            $course_stmt->close();
         }
-        $course_stmt->close();
         
         $stmt->close();
         closeDBConnection($conn);
         
         // Redirect to login with success message
-        // In production, you might want to email the student ID and temp password
-        header("Location: login.php?signup=success&student_id=" . $student_id . "&temp_password=" . urlencode($temp_password));
+        // In production, you might want to email the ID and temp password
+        $id_label = $account_type === 'teacher' ? 'teacher_id' : 'student_id';
+        header("Location: login.php?signup=success&" . $id_label . "=" . $student_id . "&temp_password=" . urlencode($temp_password) . "&account_type=" . $account_type);
         exit();
     } else {
         $stmt->close();

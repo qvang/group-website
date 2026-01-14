@@ -76,9 +76,9 @@ session_start();
             </select>
           </div>
           
-          <div class="form-group">
+          <div class="form-group" id="course-selection-group">
             <label for="course-selection">Select course(s)</label>
-            <select id="course-selection" name="course_selection" required>
+            <select id="course-selection" name="course_selection">
               <option value="">Select...</option>
               <option value="networks">Networks</option>
               <option value="data-structures">Data structure & Algorithms</option>
@@ -88,6 +88,23 @@ session_start();
               <option value="python">Python</option>
             </select>
           </div>
+          
+          <script>
+            // Show/hide course selection based on account type
+            document.getElementById('account-type').addEventListener('change', function() {
+              const courseGroup = document.getElementById('course-selection-group');
+              const courseSelect = document.getElementById('course-selection');
+              
+              if (this.value === 'teacher') {
+                courseGroup.style.display = 'none';
+                courseSelect.removeAttribute('required');
+                courseSelect.value = '';
+              } else {
+                courseGroup.style.display = 'block';
+                courseSelect.setAttribute('required', 'required');
+              }
+            });
+          </script>
           
           <button type="submit" class="btn-signup-form">Sign up</button>
         </form>

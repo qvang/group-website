@@ -44,8 +44,9 @@ session_start();
           <?php
           $error = $_GET['error'];
           if ($error == 'empty_fields') echo 'Please fill in all fields.';
-          elseif ($error == 'invalid_id') echo 'Invalid student ID format. Please enter an 8-digit ID.';
-          elseif ($error == 'invalid_credentials') echo 'Invalid student ID or password.';
+          elseif ($error == 'invalid_id') echo 'Invalid ID format. Please enter an 8-digit ID.';
+          elseif ($error == 'invalid_credentials') echo 'Invalid ID or password.';
+          elseif ($error == 'pending_approval') echo 'Your account is pending approval. Please wait for an administrator or teacher to approve your account.';
           else echo 'An error occurred. Please try again.';
           ?>
         </div>
@@ -53,7 +54,13 @@ session_start();
       
       <?php if (isset($_GET['signup'])): ?>
         <div class="success-message">
-          Registration successful! Your Student ID: <?php echo htmlspecialchars($_GET['student_id']); ?><br>
+          Registration successful! 
+          <?php 
+          $account_type = isset($_GET['account_type']) ? $_GET['account_type'] : 'student';
+          $id_label = $account_type === 'teacher' ? 'Teacher ID' : 'Student ID';
+          $id_value = isset($_GET['teacher_id']) ? $_GET['teacher_id'] : (isset($_GET['student_id']) ? $_GET['student_id'] : '');
+          ?>
+          Your <?php echo htmlspecialchars($id_label); ?>: <?php echo htmlspecialchars($id_value); ?><br>
           Temporary Password: <?php echo htmlspecialchars($_GET['temp_password']); ?><br>
           Please log in and change your password.
         </div>

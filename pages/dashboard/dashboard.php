@@ -8,6 +8,12 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     exit();
 }
 
+// Check if user is approved
+if (!isset($_SESSION['status']) || $_SESSION['status'] !== 'approved') {
+    header("Location: ../login.php?error=pending_approval");
+    exit();
+}
+
 // Redirect teachers to teacher dashboard
 if (isset($_SESSION['account_type']) && $_SESSION['account_type'] === 'teacher') {
     header("Location: teacher_dashboard.php");

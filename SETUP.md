@@ -27,21 +27,27 @@
    define('DB_NAME', 'codex_db');        // Change if needed
    ```
 
-### 2.5. Admin Account
+### 2.5. Admin Account Setup
 
-A default admin account is created in the database schema:
-- **Student ID:** 99999999
-- **Password:** admin123 (or check the schema.sql file for the actual default)
+After setting up your database, you need to configure the admin account password:
 
-**Important:** Change the admin password after first login for security. You can create a new password hash using:
-```bash
-php -r "echo password_hash('your_new_password', PASSWORD_DEFAULT);"
-```
+**Option 1: Use the setup script (Recommended)**
+1. Navigate to: `http://localhost/group-website/setup_admin.php` in your browser
+2. The script will automatically create/update the admin account with the correct password hash
+3. Default credentials:
+   - **Student ID:** 99999999
+   - **Password:** admin123
 
-Then update the password in the database:
-```sql
-UPDATE users SET password = 'your_new_hash' WHERE student_id = 99999999;
-```
+**Option 2: Manual setup**
+1. Generate a password hash using `generate_admin_hash.php`:
+   - Navigate to: `http://localhost/group-website/generate_admin_hash.php`
+   - Copy the generated hash
+2. Update the database:
+   ```sql
+   UPDATE users SET password = '[paste_hash_here]' WHERE student_id = 99999999;
+   ```
+
+**Important:** Change the admin password after first login for security.
 
 ### 3. File Renaming
 

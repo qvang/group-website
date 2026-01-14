@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $conn = getDBConnection();
     
     // Prepare statement to prevent SQL injection
-    $stmt = $conn->prepare("SELECT id, student_id, name, email, password, account_type FROM users WHERE student_id = ?");
+    $stmt = $conn->prepare("SELECT id, student_id, name, email, password, account_type, status FROM users WHERE student_id = ?");
     $stmt->bind_param("i", $student_id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -34,12 +34,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         // Verify password
         if (password_verify($password, $user['password'])) {
-            // Password is correct, start session
+            // Check if user is approved
+            if ($user['status'] !== 'approved') {
+                header("Location: login.php?error=pending_approval");
+                exit();
+            }
+            
+            // Password is correct and user is approved, start session
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['student_id'] = $user['student_id'];
             $_SESSION['name'] = $user['name'];
             $_SESSION['email'] = $user['email'];
             $_SESSION['account_type'] = $user['account_type'];
+            $_SESSION['status'] = $user['status'];
             $_SESSION['logged_in'] = true;
             
             // Redirect based on account type
