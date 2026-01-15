@@ -207,7 +207,7 @@ closeDBConnection($conn);
                                             <h3 class="item-title"><?php echo htmlspecialchars($student['name']); ?></h3>
                                             <p class="item-details"><?php echo htmlspecialchars($student['student_id']); ?></p>
                                         </div>
-                                        <a href="#" class="btn-view">View</a>
+                                        <a href="view_student.php?student_id=<?php echo $student['id']; ?>" class="btn-view">View</a>
                                     </div>
                                 <?php endforeach; ?>
                             </div>
