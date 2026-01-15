@@ -673,3 +673,21 @@
     background-color: var(--color-black-dark);
     border-color: var(--color-black-dark);
 }
+
+.btn-change-password {
+    padding: 0.5rem 1rem;
+    background-color: #f5f5f5;
+    color: #333;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.btn-change-password:hover {
+    background-color: #e8e8e8;
+    border-color: #d0d0d0;
+}
