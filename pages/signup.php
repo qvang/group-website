@@ -78,30 +78,56 @@ session_start();
           
           <div class="form-group" id="course-selection-group">
             <label for="course-selection">Select course(s)</label>
-            <select id="course-selection" name="course_selection">
-              <option value="">Select...</option>
-              <option value="networks">Networks</option>
-              <option value="data-structures">Data structure & Algorithms</option>
-              <option value="web-dev">Professional Web Development</option>
-              <option value="software-eng">Software Engineering</option>
-              <option value="javascript">Javascript</option>
-              <option value="python">Python</option>
-            </select>
+            <div id="course-checkboxes" style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.5rem;">
+              <?php
+              require_once '../config/db_connection.php';
+              $conn = getDBConnection();
+              $courses_stmt = $conn->prepare("SELECT id, course_code, course_name FROM courses ORDER BY course_name");
+              $courses_stmt->execute();
+              $courses_result = $courses_stmt->get_result();
+              while ($course = $courses_result->fetch_assoc()):
+              ?>
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                  <input type="checkbox" name="course_selection[]" value="<?php echo htmlspecialchars($course['course_code']); ?>" style="width: auto; cursor: pointer;">
+                  <span><?php echo htmlspecialchars($course['course_name']); ?></span>
+                </label>
+              <?php
+              endwhile;
+              $courses_stmt->close();
+              closeDBConnection($conn);
+              ?>
+            </div>
           </div>
           
           <script>
             // Show/hide course selection based on account type
             document.getElementById('account-type').addEventListener('change', function() {
               const courseGroup = document.getElementById('course-selection-group');
-              const courseSelect = document.getElementById('course-selection');
+              const courseCheckboxes = document.getElementById('course-checkboxes');
+              const checkboxes = courseCheckboxes.querySelectorAll('input[type="checkbox"]');
               
               if (this.value === 'teacher') {
                 courseGroup.style.display = 'none';
-                courseSelect.removeAttribute('required');
-                courseSelect.value = '';
+                // Uncheck all checkboxes
+                checkboxes.forEach(cb => {
+                  cb.checked = false;
+                });
               } else {
                 courseGroup.style.display = 'block';
-                courseSelect.setAttribute('required', 'required');
+              }
+            });
+            
+            // Ensure at least one course is selected for students
+            document.querySelector('.signup-form').addEventListener('submit', function(e) {
+              const accountType = document.getElementById('account-type').value;
+              if (accountType === 'student') {
+                const checkboxes = document.querySelectorAll('input[name="course_selection[]"]');
+                const checked = Array.from(checkboxes).some(cb => cb.checked);
+                if (!checked) {
+                  e.preventDefault();
+                  alert('Please select at least one course.');
+                  return false;
+                }
               }
             });
           </script>

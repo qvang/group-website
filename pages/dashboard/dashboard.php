@@ -26,13 +26,30 @@ require_once '../../config/db_connection.php';
 $user_name = $_SESSION['name'];
 $user_id = $_SESSION['user_id'];
 
-// Get user's enrolled courses
+// Get user's enrolled courses with actual lesson and project counts
 $conn = getDBConnection();
 $stmt = $conn->prepare("
-    SELECT c.course_code, c.course_name 
+    SELECT 
+        c.id,
+        c.course_code, 
+        c.course_name,
+        COALESCE(lesson_counts.total_lessons, 0) as total_lessons,
+        COALESCE(project_counts.total_projects, 0) as total_projects
     FROM user_courses uc
     JOIN courses c ON uc.course_id = c.id
+    LEFT JOIN (
+        SELECT m.course_id, COUNT(l.id) as total_lessons
+        FROM modules m
+        LEFT JOIN lessons l ON m.id = l.module_id
+        GROUP BY m.course_id
+    ) as lesson_counts ON c.id = lesson_counts.course_id
+    LEFT JOIN (
+        SELECT course_id, COUNT(id) as total_projects
+        FROM projects
+        GROUP BY course_id
+    ) as project_counts ON c.id = project_counts.course_id
     WHERE uc.user_id = ?
+    ORDER BY c.course_name
 ");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
@@ -43,26 +60,6 @@ while ($row = $courses_result->fetch_assoc()) {
 }
 $stmt->close();
 closeDBConnection($conn);
-
-// Course data with lessons and projects (you can make this dynamic later)
-$course_data = [
-    'networks' => ['lessons' => 15, 'projects' => 2],
-    'data-structures' => ['lessons' => 10, 'projects' => 1],
-    'web-dev' => ['lessons' => 7, 'projects' => 3],
-    'software-eng' => ['lessons' => 12, 'projects' => 2],
-    'javascript' => ['lessons' => 20, 'projects' => 5],
-    'python' => ['lessons' => 18, 'projects' => 4]
-];
-
-// Map course codes to display names
-$course_display_names = [
-    'networks' => 'Networks',
-    'data-structures' => 'Data structure & Algorithms',
-    'web-dev' => 'Professional Web Development',
-    'software-eng' => 'Software Engineering',
-    'javascript' => 'Javascript',
-    'python' => 'Python'
-];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -106,19 +103,17 @@ $course_display_names = [
                     <?php else: ?>
                         <div class="courses-list">
                             <?php foreach ($enrolled_courses as $course): 
-                                $course_code = $course['course_code'];
-                                $lessons = isset($course_data[$course_code]['lessons']) ? $course_data[$course_code]['lessons'] : 0;
-                                $projects = isset($course_data[$course_code]['projects']) ? $course_data[$course_code]['projects'] : 0;
-                                $display_name = isset($course_display_names[$course_code]) ? $course_display_names[$course_code] : $course['course_name'];
+                                $lessons = intval($course['total_lessons']);
+                                $projects = intval($course['total_projects']);
                             ?>
                                 <div class="course-item">
                                     <div class="course-info">
-                                        <h3 class="course-title"><?php echo htmlspecialchars($display_name); ?></h3>
+                                        <h3 class="course-title"><?php echo htmlspecialchars($course['course_name']); ?></h3>
                                         <p class="course-details">
                                             <?php echo $lessons; ?> Lessons • <?php echo $projects; ?> Project<?php echo $projects != 1 ? 's' : ''; ?>
                                         </p>
                                     </div>
-                                    <a href="#" class="btn-view">View</a>
+                                    <a href="student_view_course.php?course_id=<?php echo $course['id']; ?>" class="btn-view">View</a>
                                 </div>
                             <?php endforeach; ?>
                         </div>

@@ -72,17 +72,34 @@ while ($row = $students_result->fetch_assoc()) {
 }
 $students_stmt->close();
 
-// Get pending students (for approval)
+// Get pending students (for approval) with their selected courses
 $pending_students_stmt = $conn->prepare("
-    SELECT id, name, student_id, email
-    FROM users
-    WHERE account_type = 'student' AND status = 'pending'
-    ORDER BY created_at DESC
+    SELECT u.id, u.name, u.student_id, u.email
+    FROM users u
+    WHERE u.account_type = 'student' AND u.status = 'pending'
+    ORDER BY u.created_at DESC
 ");
 $pending_students_stmt->execute();
 $pending_students_result = $pending_students_stmt->get_result();
 $pending_students = [];
 while ($row = $pending_students_result->fetch_assoc()) {
+    // Get courses for this student
+    $courses_stmt = $conn->prepare("
+        SELECT c.course_name
+        FROM user_courses uc
+        JOIN courses c ON uc.course_id = c.id
+        WHERE uc.user_id = ?
+        ORDER BY c.course_name
+    ");
+    $courses_stmt->bind_param("i", $row['id']);
+    $courses_stmt->execute();
+    $courses_result = $courses_stmt->get_result();
+    $courses = [];
+    while ($course_row = $courses_result->fetch_assoc()) {
+        $courses[] = $course_row['course_name'];
+    }
+    $courses_stmt->close();
+    $row['courses'] = $courses;
     $pending_students[] = $row;
 }
 $pending_students_stmt->close();
@@ -123,9 +140,14 @@ closeDBConnection($conn);
                 <p class="dashboard-subtitle"><?php echo htmlspecialchars($user_name); ?></p>
                 
                 <?php if (isset($_GET['success'])): ?>
-                    <div class="success-message" style="background-color: #d4edda; color: #155724; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                    <?php
+                    $success = $_GET['success'];
+                    $is_rejection = $success == 'user_rejected';
+                    $bg_color = $is_rejection ? '#f8d7da' : '#d4edda';
+                    $text_color = $is_rejection ? '#721c24' : '#155724';
+                    ?>
+                    <div class="success-message" style="background-color: <?php echo $bg_color; ?>; color: <?php echo $text_color; ?>; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
                         <?php
-                        $success = $_GET['success'];
                         if ($success == 'user_approved') echo 'Student approved successfully.';
                         elseif ($success == 'user_rejected') echo 'Student rejected successfully.';
                         ?>
@@ -206,6 +228,15 @@ closeDBConnection($conn);
                                     <div class="application-info">
                                         <h3 class="application-name"><?php echo htmlspecialchars($student['name']); ?></h3>
                                         <p class="application-email"><?php echo htmlspecialchars($student['email']); ?></p>
+                                        <?php if (!empty($student['courses'])): ?>
+                                            <p class="application-courses" style="font-size: 0.875rem; color: #666; margin-top: 0.25rem;">
+                                                Courses: <?php echo htmlspecialchars(implode(', ', $student['courses'])); ?>
+                                            </p>
+                                        <?php else: ?>
+                                            <p class="application-courses" style="font-size: 0.875rem; color: #999; margin-top: 0.25rem; font-style: italic;">
+                                                No courses selected
+                                            </p>
+                                        <?php endif; ?>
                                     </div>
                                     <div class="application-actions">
                                         <form method="POST" action="../approve_user.php" style="display: inline;">

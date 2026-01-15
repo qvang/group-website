@@ -8,7 +8,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = isset($_POST['name']) ? trim($_POST['name']) : '';
     $email = isset($_POST['email']) ? trim($_POST['email']) : '';
     $account_type = isset($_POST['account_type']) ? $_POST['account_type'] : '';
-    $course_selection = isset($_POST['course_selection']) ? $_POST['course_selection'] : '';
+    $course_selection = isset($_POST['course_selection']) ? $_POST['course_selection'] : [];
     
     // Validate input (course_selection only required for students)
     if (empty($name) || empty($email) || empty($account_type)) {
@@ -17,9 +17,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     
     // Course selection is required for students only
-    if ($account_type === 'student' && empty($course_selection)) {
-        header("Location: signup.php?error=empty_fields");
-        exit();
+    if ($account_type === 'student') {
+        // Ensure course_selection is an array
+        if (!is_array($course_selection)) {
+            $course_selection = [];
+        }
+        // Filter out empty values
+        $course_selection = array_filter($course_selection);
+        
+        if (empty($course_selection)) {
+            header("Location: signup.php?error=empty_fields");
+            exit();
+        }
     }
     
     // Validate email format
@@ -61,7 +70,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     // Insert new user (course_selection can be NULL for teachers)
     // All new users start with 'pending' status and need approval
-    $course_selection_value = $account_type === 'student' ? $course_selection : null;
+    $course_selection_value = $account_type === 'student' && !empty($course_selection) ? implode(',', $course_selection) : null;
     $status = 'pending';
     $stmt = $conn->prepare("INSERT INTO users (student_id, name, email, password, account_type, status, course_selection) VALUES (?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("issssss", $student_id, $name, $email, $hashed_password, $account_type, $status, $course_selection_value);
@@ -71,23 +80,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         // Only enroll students in courses (teachers don't need course enrollment)
         if ($account_type === 'student' && !empty($course_selection)) {
-            // Get the course ID
+            // Enroll student in all selected courses
             $course_stmt = $conn->prepare("SELECT id FROM courses WHERE course_code = ?");
-            $course_stmt->bind_param("s", $course_selection);
-            $course_stmt->execute();
-            $course_result = $course_stmt->get_result();
+            $link_stmt = $conn->prepare("INSERT INTO user_courses (user_id, course_id) VALUES (?, ?)");
             
-            if ($course_result->num_rows > 0) {
-                $course = $course_result->fetch_assoc();
-                $course_id = $course['id'];
+            foreach ($course_selection as $course_code) {
+                $course_code = trim($course_code);
+                if (empty($course_code)) continue;
                 
-                // Link user to course
-                $link_stmt = $conn->prepare("INSERT INTO user_courses (user_id, course_id) VALUES (?, ?)");
-                $link_stmt->bind_param("ii", $user_id, $course_id);
-                $link_stmt->execute();
-                $link_stmt->close();
+                $course_stmt->bind_param("s", $course_code);
+                $course_stmt->execute();
+                $course_result = $course_stmt->get_result();
+                
+                if ($course_result->num_rows > 0) {
+                    $course = $course_result->fetch_assoc();
+                    $course_id = $course['id'];
+                    
+                    // Check if enrollment already exists (prevent duplicates)
+                    $check_stmt = $conn->prepare("SELECT id FROM user_courses WHERE user_id = ? AND course_id = ?");
+                    $check_stmt->bind_param("ii", $user_id, $course_id);
+                    $check_stmt->execute();
+                    $check_result = $check_stmt->get_result();
+                    
+                    if ($check_result->num_rows === 0) {
+                        // Link user to course
+                        $link_stmt->bind_param("ii", $user_id, $course_id);
+                        $link_stmt->execute();
+                    }
+                    $check_stmt->close();
+                }
             }
             $course_stmt->close();
+            $link_stmt->close();
         }
         
         $stmt->close();
