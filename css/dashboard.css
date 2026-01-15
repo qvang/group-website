@@ -691,3 +691,38 @@
     background-color: #e8e8e8;
     border-color: #d0d0d0;
 }
+
+.btn-submit-password {
+    padding: 0.75rem 1.5rem;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.btn-submit-password:hover {
+    background-color: #555;
+}
+
+.btn-cancel-password {
+    padding: 0.75rem 1.5rem;
+    background-color: #f5f5f5;
+    color: #333;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.btn-cancel-password:hover {
+    background-color: #e8e8e8;
+    border-color: #d0d0d0;
+}

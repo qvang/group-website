@@ -97,7 +97,52 @@ $dashboard_url = $_SESSION['account_type'] === 'teacher' ? 'teacher_dashboard.ph
                             <strong style="font-size: 0.875rem; color: #666; text-transform: uppercase; letter-spacing: 0.5px;">Password</strong>
                             <div style="display: flex; align-items: center; gap: 1rem;">
                                 <span style="font-size: 1.1rem; color: #333; font-family: monospace; letter-spacing: 2px;">••••••••</span>
-                                <button type="button" class="btn-change-password" style="padding: 0.5rem 1rem; background-color: #f5f5f5; color: #333; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; font-family: inherit;">Change</button>
+                                <button type="button" id="btn-change-password" class="btn-change-password" style="padding: 0.5rem 1rem; background-color: #f5f5f5; color: #333; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; font-family: inherit;">Change</button>
+                            </div>
+                            
+                            <!-- Password Change Form (initially hidden) -->
+                            <div id="password-change-form" style="display: none; margin-top: 1rem; padding: 1.5rem; background: #f8f9fa; border-radius: 6px; border: 1px solid #e0e0e0;">
+                                <?php if (isset($_GET['error'])): ?>
+                                    <div class="error-message" style="background-color: #f8d7da; color: #721c24; padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.875rem;">
+                                        <?php
+                                        $error = $_GET['error'];
+                                        if ($error == 'empty_fields') echo 'Please fill in all fields.';
+                                        elseif ($error == 'wrong_old_password') echo 'Old password is incorrect.';
+                                        elseif ($error == 'password_mismatch') echo 'New passwords do not match.';
+                                        elseif ($error == 'same_password') echo 'New password must be different from the old password.';
+                                        elseif ($error == 'update_failed') echo 'Failed to update password. Please try again.';
+                                        else echo 'An error occurred. Please try again.';
+                                        ?>
+                                    </div>
+                                <?php endif; ?>
+                                
+                                <?php if (isset($_GET['success']) && $_GET['success'] == 'password_changed'): ?>
+                                    <div class="success-message" style="background-color: #d4edda; color: #155724; padding: 0.75rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.875rem;">
+                                        Password changed successfully.
+                                    </div>
+                                <?php endif; ?>
+                                
+                                <form method="POST" action="change_password.php" style="display: flex; flex-direction: column; gap: 1rem;">
+                                    <div class="form-group" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                        <label for="old_password" style="font-size: 0.875rem; font-weight: 500; color: #333;">Old Password</label>
+                                        <input type="password" id="old_password" name="old_password" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem; font-family: inherit;">
+                                    </div>
+                                    
+                                    <div class="form-group" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                        <label for="new_password" style="font-size: 0.875rem; font-weight: 500; color: #333;">New Password</label>
+                                        <input type="password" id="new_password" name="new_password" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem; font-family: inherit;">
+                                    </div>
+                                    
+                                    <div class="form-group" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                        <label for="confirm_password" style="font-size: 0.875rem; font-weight: 500; color: #333;">Confirm New Password</label>
+                                        <input type="password" id="confirm_password" name="confirm_password" required style="padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem; font-family: inherit;">
+                                    </div>
+                                    
+                                    <div style="display: flex; gap: 1rem;">
+                                        <button type="submit" class="btn-submit-password" style="padding: 0.75rem 1.5rem; background-color: #333; color: white; border: none; border-radius: 6px; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; font-family: inherit;">Update Password</button>
+                                        <button type="button" id="btn-cancel-password" class="btn-cancel-password" style="padding: 0.75rem 1.5rem; background-color: #f5f5f5; color: #333; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; font-family: inherit;">Cancel</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -107,5 +152,51 @@ $dashboard_url = $_SESSION['account_type'] === 'teacher' ? 'teacher_dashboard.ph
     </main>
 
     <script src="../../js/app.js" defer></script>
+    <script>
+        // Toggle password change form visibility
+        document.addEventListener('DOMContentLoaded', function() {
+            const changeBtn = document.getElementById('btn-change-password');
+            const cancelBtn = document.getElementById('btn-cancel-password');
+            const passwordForm = document.getElementById('password-change-form');
+            
+            if (changeBtn && passwordForm) {
+                changeBtn.addEventListener('click', function() {
+                    passwordForm.style.display = passwordForm.style.display === 'none' ? 'block' : 'none';
+                });
+            }
+            
+            if (cancelBtn && passwordForm) {
+                cancelBtn.addEventListener('click', function() {
+                    passwordForm.style.display = 'none';
+                    // Clear form fields
+                    document.getElementById('old_password').value = '';
+                    document.getElementById('new_password').value = '';
+                    document.getElementById('confirm_password').value = '';
+                });
+            }
+            
+            // Show form if there are error or success messages
+            <?php if (isset($_GET['error']) || isset($_GET['success'])): ?>
+                if (passwordForm) {
+                    passwordForm.style.display = 'block';
+                }
+            <?php endif; ?>
+            
+            // Client-side validation for password match
+            const form = document.querySelector('#password-change-form form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    const newPassword = document.getElementById('new_password').value;
+                    const confirmPassword = document.getElementById('confirm_password').value;
+                    
+                    if (newPassword !== confirmPassword) {
+                        e.preventDefault();
+                        alert('New passwords do not match. Please try again.');
+                        return false;
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
