@@ -1,20 +1,25 @@
 <?php
+// Start output buffering to prevent any output before headers
+ob_start();
 session_start();
 
 // Check if user is logged in
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    ob_end_clean();
     header("Location: ../login.php?error=login_required");
     exit();
 }
 
 // Check if user is approved
 if (!isset($_SESSION['status']) || $_SESSION['status'] !== 'approved') {
+    ob_end_clean();
     header("Location: ../login.php?error=pending_approval");
     exit();
 }
 
 // Check if user is a teacher or student
 if (!isset($_SESSION['account_type']) || !in_array($_SESSION['account_type'], ['teacher', 'student'])) {
+    ob_end_clean();
     header("Location: ../login.php?error=unauthorized");
     exit();
 }
@@ -23,6 +28,7 @@ require_once '../../config/db_connection.php';
 
 // Get project ID from URL
 if (!isset($_GET['project_id']) || !isset($_GET['course_id'])) {
+    ob_end_clean();
     $redirect_page = ($_SESSION['account_type'] === 'teacher') ? 'teacher_dashboard.php' : 'dashboard.php';
     header("Location: " . $redirect_page . "?error=invalid_project");
     exit();
@@ -47,6 +53,7 @@ $project_result = $project_stmt->get_result();
 if ($project_result->num_rows === 0) {
     $project_stmt->close();
     closeDBConnection($conn);
+    ob_end_clean();
     $redirect_page = ($_SESSION['account_type'] === 'teacher') ? 'view_course.php' : 'student_view_course.php';
     header("Location: " . $redirect_page . "?course_id=" . $course_id . "&error=project_not_found");
     exit();
@@ -70,6 +77,7 @@ if ($_SESSION['account_type'] === 'student') {
     if ($enrollment_result->num_rows === 0) {
         $enrollment_stmt->close();
         closeDBConnection($conn);
+        ob_end_clean();
         header("Location: dashboard.php?error=not_enrolled");
         exit();
     }
@@ -90,6 +98,7 @@ $file_result = $file_stmt->get_result();
 if ($file_result->num_rows === 0) {
     $file_stmt->close();
     closeDBConnection($conn);
+    ob_end_clean();
     $redirect_page = ($_SESSION['account_type'] === 'teacher') ? 'view_course.php' : 'student_view_course.php';
     header("Location: " . $redirect_page . "?course_id=" . $course_id . "&error=file_not_found");
     exit();
@@ -104,6 +113,7 @@ $file_path = '../../uploads/course_files/' . $file['file_path'];
 
 // Check if file exists
 if (!file_exists($file_path)) {
+    ob_end_clean();
     $redirect_page = ($_SESSION['account_type'] === 'teacher') ? 'view_course.php' : 'student_view_course.php';
     header("Location: " . $redirect_page . "?course_id=" . $course_id . "&error=file_missing");
     exit();
@@ -122,6 +132,9 @@ if ($file_extension === 'pdf') {
     $disposition = 'attachment'; // Word docs should download
 }
 
+// Clear any output buffer before sending headers
+ob_end_clean();
+
 header('Content-Type: ' . $content_type);
 header('Content-Disposition: ' . $disposition . '; filename="' . htmlspecialchars($file['original_name']) . '"');
 header('Content-Length: ' . filesize($file_path));
@@ -131,4 +144,3 @@ header('Pragma: public');
 // Output file
 readfile($file_path);
 exit();
-?>
