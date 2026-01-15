@@ -535,15 +535,35 @@
     margin: 0 0 1rem 0;
 }
 
+.projects-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.project-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.project-item:last-child {
+    border-bottom: none;
+}
+
 .project-link {
     color: var(--accent-blue);
     text-decoration: none;
     font-size: 0.95rem;
+    flex: 1;
 }
 
 .project-link:hover {
     text-decoration: underline;
 }
+
 
 .course-files-section {
     margin-top: 3rem;

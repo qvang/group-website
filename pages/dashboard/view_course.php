@@ -102,12 +102,14 @@ while ($row = $files_result->fetch_assoc()) {
 }
 $files_stmt->close();
 
-// Get projects for this course
+// Get projects for this course with their associated files
 $projects_stmt = $conn->prepare("
-    SELECT id, project_name, description, module_id 
-    FROM projects 
-    WHERE course_id = ? 
-    ORDER BY display_order ASC, created_at ASC
+    SELECT p.id, p.project_name, p.description, p.module_id,
+           cf.id as file_id, cf.file_path, cf.original_name, cf.file_type
+    FROM projects p
+    LEFT JOIN course_files cf ON p.id = cf.project_id
+    WHERE p.course_id = ? 
+    ORDER BY p.display_order ASC, p.created_at ASC
 ");
 $projects_stmt->bind_param("i", $course_id);
 $projects_stmt->execute();
@@ -165,12 +167,13 @@ closeDBConnection($conn);
                     <div class="success-message" style="background-color: #d4edda; color: #155724; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
                         <?php
                         $success = $_GET['success'];
-                        if ($success == 'file_uploaded') echo 'File uploaded successfully and lesson created.';
-                        elseif ($success == 'files_uploaded') echo 'Files uploaded successfully and lessons created.';
+                        if ($success == 'file_uploaded') echo 'File uploaded successfully and lesson/project created.';
+                        elseif ($success == 'files_uploaded') echo 'Files uploaded successfully and lessons/projects created.';
                         elseif ($success == 'file_removed') echo 'File removed successfully.';
                         elseif ($success == 'module_created') echo 'Module created successfully.';
                         elseif ($success == 'module_removed') echo 'Module removed successfully.';
                         elseif ($success == 'lesson_removed') echo 'Lesson removed successfully.';
+                        elseif ($success == 'project_removed') echo 'Project removed successfully.';
                         ?>
                     </div>
                 <?php endif; ?>
@@ -190,6 +193,7 @@ closeDBConnection($conn);
                         elseif ($error == 'lesson_not_found') echo 'Lesson not found.';
                         elseif ($error == 'file_not_found') echo 'File not found.';
                         elseif ($error == 'file_missing') echo 'File is missing from server.';
+                        elseif ($error == 'project_not_found') echo 'Project not found.';
                         else echo 'An error occurred.';
                         ?>
                     </div>
@@ -239,7 +243,6 @@ closeDBConnection($conn);
                                 <label for="file-<?php echo $module['id']; ?>" class="btn-upload" style="cursor: pointer; display: inline-block;">Upload Files</label>
                                 <input type="file" name="file[]" id="file-<?php echo $module['id']; ?>" multiple accept=".pdf,.doc,.docx" style="display: none;" onchange="this.form.submit()">
                             </form>
-                            <a href="remove_module.php?module_id=<?php echo $module['id']; ?>&course_id=<?php echo $course_id; ?>" class="btn-remove-module" onclick="return confirm('Are you sure you want to remove this module? This will also remove all lessons and projects in this module.');">Remove Module</a>
                         </div>
                         
                         <div class="module-divider"></div>
@@ -248,9 +251,38 @@ closeDBConnection($conn);
                             <h3 class="projects-title">Projects</h3>
                             <?php if (empty($module_projects)): ?>
                                 <p class="no-items">No projects yet.</p>
+                                <form method="POST" action="upload_file.php" enctype="multipart/form-data" class="upload-form" style="margin-top: 1rem;">
+                                    <input type="hidden" name="course_id" value="<?php echo $course_id; ?>">
+                                    <input type="hidden" name="module_id" value="<?php echo $module['id']; ?>">
+                                    <input type="hidden" name="upload_type" value="project">
+                                    <label for="project-file-<?php echo $module['id']; ?>" class="btn-upload">Upload Files</label>
+                                    <input type="file" name="file[]" id="project-file-<?php echo $module['id']; ?>" multiple accept=".pdf,.doc,.docx" style="display: none;" onchange="this.form.submit()">
+                                </form>
                             <?php else: ?>
-                                <a href="#" class="project-link">View project submissions</a>
+                                <ul class="projects-list">
+                                    <?php foreach ($module_projects as $project): ?>
+                                        <li class="project-item">
+                                            <a href="<?php echo $project['file_id'] ? 'view_project.php?project_id=' . $project['id'] . '&course_id=' . $course_id : '#'; ?>" class="project-link"><?php echo htmlspecialchars($project['project_name']); ?></a>
+                                            <div class="lesson-actions">
+                                                <?php if ($project['file_id']): ?>
+                                                    <a href="view_project.php?project_id=<?php echo $project['id']; ?>&course_id=<?php echo $course_id; ?>" class="btn-view-lesson">View</a>
+                                                <?php endif; ?>
+                                                <a href="remove_project.php?project_id=<?php echo $project['id']; ?>&course_id=<?php echo $course_id; ?>" class="btn-remove-link" onclick="return confirm('Are you sure you want to remove this project? This will also delete the associated file.');">Remove</a>
+                                            </div>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
+                                <form method="POST" action="upload_file.php" enctype="multipart/form-data" class="upload-form" style="margin-top: 1rem;">
+                                    <input type="hidden" name="course_id" value="<?php echo $course_id; ?>">
+                                    <input type="hidden" name="module_id" value="<?php echo $module['id']; ?>">
+                                    <input type="hidden" name="upload_type" value="project">
+                                    <label for="project-file-<?php echo $module['id']; ?>" class="btn-upload">Upload Files</label>
+                                    <input type="file" name="file[]" id="project-file-<?php echo $module['id']; ?>" multiple accept=".pdf,.doc,.docx" style="display: none;" onchange="this.form.submit()">
+                                </form>
                             <?php endif; ?>
+                            <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end;">
+                                <a href="remove_module.php?module_id=<?php echo $module['id']; ?>&course_id=<?php echo $course_id; ?>" class="btn-remove-module" onclick="return confirm('Are you sure you want to remove this module? This will also remove all lessons and projects in this module.');">Remove Module</a>
+                            </div>
                         </div>
                     </div>
                 <?php endforeach; ?>

@@ -72,29 +72,8 @@ CREATE TABLE IF NOT EXISTS lessons (
     INDEX idx_module_id (module_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Course files table (PDFs, Word docs, etc.)
-CREATE TABLE IF NOT EXISTS course_files (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    course_id INT NOT NULL,
-    module_id INT NULL,
-    lesson_id INT NULL,
-    file_name VARCHAR(255) NOT NULL,
-    original_name VARCHAR(255) NOT NULL,
-    file_path VARCHAR(500) NOT NULL,
-    file_type VARCHAR(50) NOT NULL,
-    file_size INT NOT NULL,
-    uploaded_by INT NOT NULL,
-    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
-    FOREIGN KEY (module_id) REFERENCES modules(id) ON DELETE CASCADE,
-    FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE CASCADE,
-    FOREIGN KEY (uploaded_by) REFERENCES users(id) ON DELETE CASCADE,
-    INDEX idx_course_id (course_id),
-    INDEX idx_module_id (module_id),
-    INDEX idx_lesson_id (lesson_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 -- Projects table (for course projects)
+-- NOTE: Must be created before course_files table due to foreign key constraint
 CREATE TABLE IF NOT EXISTS projects (
     id INT AUTO_INCREMENT PRIMARY KEY,
     course_id INT NOT NULL,
@@ -107,6 +86,31 @@ CREATE TABLE IF NOT EXISTS projects (
     FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
     FOREIGN KEY (module_id) REFERENCES modules(id) ON DELETE CASCADE,
     INDEX idx_course_id (course_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Course files table (PDFs, Word docs, etc.)
+CREATE TABLE IF NOT EXISTS course_files (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    course_id INT NOT NULL,
+    module_id INT NULL,
+    lesson_id INT NULL,
+    project_id INT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    original_name VARCHAR(255) NOT NULL,
+    file_path VARCHAR(500) NOT NULL,
+    file_type VARCHAR(50) NOT NULL,
+    file_size INT NOT NULL,
+    uploaded_by INT NOT NULL,
+    uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
+    FOREIGN KEY (module_id) REFERENCES modules(id) ON DELETE CASCADE,
+    FOREIGN KEY (lesson_id) REFERENCES lessons(id) ON DELETE CASCADE,
+    FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
+    FOREIGN KEY (uploaded_by) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_course_id (course_id),
+    INDEX idx_module_id (module_id),
+    INDEX idx_lesson_id (lesson_id),
+    INDEX idx_project_id (project_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Insert default admin account

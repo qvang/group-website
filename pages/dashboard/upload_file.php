@@ -14,6 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['course_id']) && isset(
     $course_id = intval($_POST['course_id']);
     $module_id = isset($_POST['module_id']) && !empty($_POST['module_id']) ? intval($_POST['module_id']) : null;
     $lesson_id = isset($_POST['lesson_id']) && !empty($_POST['lesson_id']) ? intval($_POST['lesson_id']) : null;
+    $upload_type = isset($_POST['upload_type']) ? $_POST['upload_type'] : 'lesson'; // 'lesson' or 'project'
     $user_id = $_SESSION['user_id'];
     
     // Allowed file types
@@ -83,58 +84,100 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['course_id']) && isset(
             
             // Move uploaded file
             if (move_uploaded_file($tmp_name, $file_path)) {
-                // Verify module exists (required for creating lesson)
+                // Verify module exists (required for creating lesson/project)
                 if ($module_id === null) {
                     @unlink($file_path);
-                    $errors[] = "Module ID is required to create a lesson from file '$original_name'.";
+                    $errors[] = "Module ID is required to create a " . $upload_type . " from file '$original_name'.";
                     continue;
                 }
                 
-                // Get the highest display_order for this module to add new lesson at the end
-                $order_stmt = $conn->prepare("SELECT MAX(display_order) as max_order FROM lessons WHERE module_id = ?");
-                $order_stmt->bind_param("i", $module_id);
-                $order_stmt->execute();
-                $order_result = $order_stmt->get_result();
-                $order_row = $order_result->fetch_assoc();
-                $next_order = ($order_row['max_order'] !== null) ? $order_row['max_order'] + 1 : 0;
-                $order_stmt->close();
-                
-                // Create lesson from file name (remove extension for lesson name)
-                $lesson_name = pathinfo($original_name, PATHINFO_FILENAME);
+                // Create item name from file name (remove extension)
+                $item_name = pathinfo($original_name, PATHINFO_FILENAME);
                 
                 // Start transaction
                 $conn->begin_transaction();
                 
                 try {
-                    // Create lesson
-                    $lesson_stmt = $conn->prepare("INSERT INTO lessons (module_id, lesson_name, display_order) VALUES (?, ?, ?)");
-                    $lesson_stmt->bind_param("isi", $module_id, $lesson_name, $next_order);
-                    
-                    if (!$lesson_stmt->execute()) {
-                        throw new Exception("Failed to create lesson");
+                    if ($upload_type === 'project') {
+                        // Get the highest display_order for this course to add new project at the end
+                        $order_stmt = $conn->prepare("SELECT MAX(display_order) as max_order FROM projects WHERE course_id = ?");
+                        $order_stmt->bind_param("i", $course_id);
+                        $order_stmt->execute();
+                        $order_result = $order_stmt->get_result();
+                        $order_row = $order_result->fetch_assoc();
+                        $next_order = ($order_row['max_order'] !== null) ? $order_row['max_order'] + 1 : 0;
+                        $order_stmt->close();
+                        
+                        // Create project
+                        $project_stmt = $conn->prepare("INSERT INTO projects (course_id, module_id, project_name, display_order) VALUES (?, ?, ?, ?)");
+                        $project_stmt->bind_param("iisi", $course_id, $module_id, $item_name, $next_order);
+                        
+                        if (!$project_stmt->execute()) {
+                            throw new Exception("Failed to create project");
+                        }
+                        
+                        $new_project_id = $project_stmt->insert_id;
+                        $project_stmt->close();
+                        
+                        // Save file info to database, linked to the project
+                        $relative_path = $unique_filename; // Store relative path
+                        $file_stmt = $conn->prepare("
+                            INSERT INTO course_files (course_id, module_id, project_id, file_name, original_name, file_path, file_type, file_size, uploaded_by)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        ");
+                        
+                        $file_stmt->bind_param("iiissssii", 
+                            $course_id, 
+                            $module_id, 
+                            $new_project_id, 
+                            $unique_filename, 
+                            $original_name, 
+                            $relative_path, 
+                            $file_type, 
+                            $file_size, 
+                            $user_id
+                        );
+                    } else {
+                        // Default: create lesson
+                        // Get the highest display_order for this module to add new lesson at the end
+                        $order_stmt = $conn->prepare("SELECT MAX(display_order) as max_order FROM lessons WHERE module_id = ?");
+                        $order_stmt->bind_param("i", $module_id);
+                        $order_stmt->execute();
+                        $order_result = $order_stmt->get_result();
+                        $order_row = $order_result->fetch_assoc();
+                        $next_order = ($order_row['max_order'] !== null) ? $order_row['max_order'] + 1 : 0;
+                        $order_stmt->close();
+                        
+                        // Create lesson
+                        $lesson_stmt = $conn->prepare("INSERT INTO lessons (module_id, lesson_name, display_order) VALUES (?, ?, ?)");
+                        $lesson_stmt->bind_param("isi", $module_id, $item_name, $next_order);
+                        
+                        if (!$lesson_stmt->execute()) {
+                            throw new Exception("Failed to create lesson");
+                        }
+                        
+                        $new_lesson_id = $lesson_stmt->insert_id;
+                        $lesson_stmt->close();
+                        
+                        // Save file info to database, linked to the lesson
+                        $relative_path = $unique_filename; // Store relative path
+                        $file_stmt = $conn->prepare("
+                            INSERT INTO course_files (course_id, module_id, lesson_id, file_name, original_name, file_path, file_type, file_size, uploaded_by)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        ");
+                        
+                        $file_stmt->bind_param("iiissssii", 
+                            $course_id, 
+                            $module_id, 
+                            $new_lesson_id, 
+                            $unique_filename, 
+                            $original_name, 
+                            $relative_path, 
+                            $file_type, 
+                            $file_size, 
+                            $user_id
+                        );
                     }
-                    
-                    $new_lesson_id = $lesson_stmt->insert_id;
-                    $lesson_stmt->close();
-                    
-                    // Save file info to database, linked to the lesson
-                    $relative_path = $unique_filename; // Store relative path
-                    $file_stmt = $conn->prepare("
-                        INSERT INTO course_files (course_id, module_id, lesson_id, file_name, original_name, file_path, file_type, file_size, uploaded_by)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    ");
-                    
-                    $file_stmt->bind_param("iiissssii", 
-                        $course_id, 
-                        $module_id, 
-                        $new_lesson_id, 
-                        $unique_filename, 
-                        $original_name, 
-                        $relative_path, 
-                        $file_type, 
-                        $file_size, 
-                        $user_id
-                    );
                     
                     if (!$file_stmt->execute()) {
                         throw new Exception("Failed to save file");
@@ -146,7 +189,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['course_id']) && isset(
                 } catch (Exception $e) {
                     $conn->rollback();
                     @unlink($file_path);
-                    $errors[] = "Failed to create lesson from file '$original_name': " . $e->getMessage();
+                    $errors[] = "Failed to create " . $upload_type . " from file '$original_name': " . $e->getMessage();
                 }
             } else {
                 $errors[] = "Failed to upload file '$original_name'.";
