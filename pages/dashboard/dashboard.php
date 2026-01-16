@@ -82,7 +82,7 @@ closeDBConnection($conn);
             </div>
             <ul class="nav-links">
                 <li><a href='dashboard.php' class="nav-active">Dashboard</a></li>
-                <li><a href='#'>Quiz</a></li>
+                <li><a href='student_quiz.php'>Quiz</a></li>
                 <li><a href='profile.php'>Profile</a></li>
                 <li><a href='../logout.php'>Log out</a></li>
             </ul>

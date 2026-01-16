@@ -42,6 +42,7 @@ closeDBConnection($conn);
 
 // Determine redirect URL based on account type
 $dashboard_url = $_SESSION['account_type'] === 'teacher' ? 'teacher_dashboard.php' : 'dashboard.php';
+$quiz_url = $_SESSION['account_type'] === 'teacher' ? 'quiz.php' : 'student_quiz.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -64,7 +65,7 @@ $dashboard_url = $_SESSION['account_type'] === 'teacher' ? 'teacher_dashboard.ph
             </div>
             <ul class="nav-links">
                 <li><a href='<?php echo $dashboard_url; ?>'>Dashboard</a></li>
-                <li><a href='#'>Quiz</a></li>
+                <li><a href='<?php echo $quiz_url; ?>'>Quiz</a></li>
                 <li><a href='profile.php' class="nav-active">Profile</a></li>
                 <li><a href='../logout.php'>Log out</a></li>
             </ul>
