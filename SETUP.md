@@ -31,21 +31,11 @@
 
 After setting up your database, you need to configure the admin account password:
 
-**Option 1: Use the setup script (Recommended)**
 1. Navigate to: `http://localhost/group-website/setup_admin.php` in your browser
 2. The script will automatically create/update the admin account with the correct password hash
 3. Default credentials:
    - **Student ID:** 99999999
    - **Password:** admin123
-
-**Option 2: Manual setup**
-1. Generate a password hash using `generate_admin_hash.php`:
-   - Navigate to: `http://localhost/group-website/generate_admin_hash.php`
-   - Copy the generated hash
-2. Update the database:
-   ```sql
-   UPDATE users SET password = '[paste_hash_here]' WHERE student_id = 99999999;
-   ```
 
 **Important:** Change the admin password after first login for security.
 

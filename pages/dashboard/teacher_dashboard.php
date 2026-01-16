@@ -126,7 +126,7 @@ closeDBConnection($conn);
             </div>
             <ul class="nav-links">
                 <li><a href='teacher_dashboard.php' class="nav-active">Dashboard</a></li>
-                <li><a href='#'>Quiz</a></li>
+                <li><a href='quiz.php'>Quiz</a></li>
                 <li><a href='profile.php'>Profile</a></li>
                 <li><a href='../logout.php'>Log out</a></li>
             </ul>

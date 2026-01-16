@@ -113,6 +113,66 @@ CREATE TABLE IF NOT EXISTS course_files (
     INDEX idx_project_id (project_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Quizzes table (stores weekly quiz information)
+CREATE TABLE IF NOT EXISTS quizzes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    teacher_id INT NOT NULL,
+    quiz_title VARCHAR(255) NOT NULL,
+    total_questions INT NOT NULL DEFAULT 10,
+    time_limit INT NOT NULL DEFAULT 30,
+    week_start_date DATE NOT NULL,
+    week_end_date DATE NOT NULL,
+    is_active TINYINT(1) DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (teacher_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_teacher_id (teacher_id),
+    INDEX idx_week_start (week_start_date),
+    INDEX idx_is_active (is_active)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Quiz questions table (stores individual quiz questions)
+CREATE TABLE IF NOT EXISTS quiz_questions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    quiz_id INT NOT NULL,
+    question_text TEXT NOT NULL,
+    question_order INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE,
+    INDEX idx_quiz_id (quiz_id),
+    INDEX idx_question_order (question_order)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Quiz options table (stores multiple choice options for each question)
+CREATE TABLE IF NOT EXISTS quiz_options (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    question_id INT NOT NULL,
+    option_text VARCHAR(500) NOT NULL,
+    option_letter CHAR(1) NOT NULL,
+    is_correct TINYINT(1) DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (question_id) REFERENCES quiz_questions(id) ON DELETE CASCADE,
+    INDEX idx_question_id (question_id),
+    INDEX idx_is_correct (is_correct)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Quiz attempts table (stores student quiz submissions)
+CREATE TABLE IF NOT EXISTS quiz_attempts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    quiz_id INT NOT NULL,
+    student_id INT NOT NULL,
+    score INT NOT NULL DEFAULT 0,
+    total_questions INT NOT NULL DEFAULT 0,
+    attempted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE,
+    FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_quiz_student (quiz_id, student_id),
+    INDEX idx_quiz_id (quiz_id),
+    INDEX idx_student_id (student_id),
+    INDEX idx_score (score DESC),
+    INDEX idx_attempted_at (attempted_at DESC)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Insert default admin account
 -- Default credentials: Student ID: 99999999, Password: admin123
 -- IMPORTANT: Change the password after first login for security
